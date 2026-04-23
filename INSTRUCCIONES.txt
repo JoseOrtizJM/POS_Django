@@ -1,0 +1,171 @@
+🎯 INSTRUCCIONES DE USO - POS MAYOREO DJANGO
+
+═══════════════════════════════════════════════════════════════════════════
+
+📍 UBICACIÓN DEL PROYECTO
+────────────────────────────────────────────────────────────────────────
+📁 C:\Users\joseo\OneDrive\Documentos\S8\Web\Django-Final
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 INICIAR LA APLICACIÓN
+────────────────────────────────────────────────────────────────────────
+
+1. Abre PowerShell o CMD
+2. Navega a la carpeta del proyecto
+3. Ejecuta el servidor:
+
+   cd "c:\Users\joseo\OneDrive\Documentos\S8\Web\Django-Final"
+   python manage.py runserver
+
+4. Verás un mensaje similart a:
+   "Starting development server at http://127.0.0.1:8000/"
+
+═══════════════════════════════════════════════════════════════════════════
+
+🌐 ACCESO A LAS PÁGINAS
+────────────────────────────────────────────────────────────────────────
+
+Dashboard (Inicio):
+└─ URL: http://localhost:8000/
+└─ Descripción: Catalogo con todas las categorías en cuadrados
+└─ Acciones: Haz clic en cualquier categoría para ver los productos
+
+Categoría Específica:
+└─ URL: http://localhost:8000/categoria/1/ (ejemplo)
+└─ Descripción: Lista detallada de productos con precios en $MXN
+└─ Categorías disponibles (IDs del 1 al 12):
+    1️⃣  Refrescos y Bebidas Carbonatadas
+    2️⃣  Aguas y Bebidas Sin Gas
+    3️⃣  Jugos y Néctares
+    4️⃣  Bebidas Calientes y Lácteas
+    5️⃣  Granos y Cereales
+    6️⃣  Pastas y Sopas
+    7️⃣  Enlatados y Conservas
+    8️⃣  Aceites, Salsas y Condimentos
+    9️⃣  Dulces y Botanas
+    🔟 Limpieza del Hogar
+    1️⃣1️⃣ Higiene Personal
+    1️⃣2️⃣ Panadería y Snacks Empacados
+
+Panel de Administración:
+└─ URL: http://localhost:8000/admin/
+└─ Usuario: admin
+└─ Contraseña: admin123
+└─ Funciones:
+    ✓ Agregar/Editar/Eliminar Categorías
+    ✓ Agregar/Editar/Eliminar Productos
+    ✓ Ver y filtrar inventario
+    ✓ Gestionar usuarios
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 INFORMACIÓN DE DATOS
+────────────────────────────────────────────────────────────────────────
+
+Categorías cargadas: 12
+Productos cargados: 105
+Inventario inicial: 50 paquetes por producto
+Todos los precios: En Pesos Mexicanos ($)
+
+═══════════════════════════════════════════════════════════════════════════
+
+⚙️ COMANDOS ÚTILES
+────────────────────────────────────────────────────────────────────────
+
+Crear un nuevo superusuario:
+   python manage.py createsuperuser
+
+Cargar datos iniciales nuevamente:
+   python manage.py cargar_datos
+
+Limpiar y recargar datos:
+   python manage.py cargar_datos --clear
+
+Crear migraciones (si modificas modelos):
+   python manage.py makemigrations catalogo
+
+Aplicar migraciones:
+   python manage.py migrate
+
+Acceder a la consola interactiva de Django:
+   python manage.py shell
+
+═══════════════════════════════════════════════════════════════════════════
+
+🗂️ ESTRUCTURA DE CARPETAS IMPORTANTE
+────────────────────────────────────────────────────────────────────────
+
+/catalogo/
+├── models.py              ← Modelos (Categoria, Producto)
+├── views.py               ← Vistas (dashboard, productos_por_categoria)
+├── urls.py                ← Rutas de la app
+├── admin.py               ← Configuración del panel admin
+└── templates/
+    └── catalogo/
+        ├── base.html      ← Template base con Bootstrap
+        ├── dashboard.html ← Dashboard con categorías en cuadrados
+        └── productos_categoria.html ← Lista de productos
+
+/POS_Django/
+├── settings.py            ← Configuración del proyecto
+├── urls.py                ← URLs principales del proyecto
+└── wsgi.py / asgi.py      ← Configuración de servidor
+
+db.sqlite3                  ← Base de datos SQLite
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎨 CARACTERÍSTICAS VISUALES
+────────────────────────────────────────────────────────────────────────
+
+✨ Dashboard:
+   - Categorías en tarjetas con emojis representativos
+   - Animaciones suaves al pasar el mouse
+   - Diseño responsive (se adapta a celulares)
+   - Barra de navegación con logo
+
+📋 Página de Productos:
+   - Tabla con información completa
+   - Código de presentación (600ml, 1kg, etc.)
+   - Tipo de paquete y cantidad de piezas
+   - Precios en pesos mexicanos
+   - Indicador visual de stock (verde/amarillo/rojo)
+   - Breadcrumb para navegar
+
+═══════════════════════════════════════════════════════════════════════════
+
+❓ SOLUCIÓN DE PROBLEMAS
+────────────────────────────────────────────────────────────────────────
+
+ERROR: "Port already in use"
+→ El puerto 8000 ya está en uso. Ejecuta:
+   python manage.py runserver 8001 (otro puerto)
+
+ERROR: "ModuleNotFoundError: No module named 'django'"
+→ El entorno virtual no está activado. Ejecuta:
+   venv\Scripts\activate (Windows)
+   
+ERROR: Base de datos corrupta
+→ Elimina db.sqlite3 y vuelve a hacer:
+   python manage.py migrate
+   python manage.py cargar_datos
+
+═══════════════════════════════════════════════════════════════════════════
+
+📱 INFORMACIÓN DE CONTACTO / PRÓXIMAS MEJORAS
+────────────────────────────────────────────────────────────────────────
+
+Características sugeridas a implementar:
+✓ Carrito de compras
+✓ Sistema de órdenes/pedidos
+✓ Descuentos por volumen
+✓ Búsqueda y filtros avanzados
+✓ Generación de reportes PDF
+✓ API REST para app móvil
+✓ Sistema de login para clientes
+✓ Historial de compras
+
+═══════════════════════════════════════════════════════════════════════════
+
+¡Proyecto completado exitosamente el 22 de abril de 2026! 🎉

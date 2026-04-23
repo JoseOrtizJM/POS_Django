@@ -1,0 +1,166 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Dashboard - Catálogo de Productos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .categoria-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--dark-border);
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        cursor: pointer;
+        background-color: var(--dark-tertiary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .categoria-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(59, 130, 246, 0.2);
+        border-color: var(--accent-blue);
+    }
+
+    .categoria-card-header {
+        background: #25386b 0%;
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .categoria-card-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        animation: float 25s infinite linear;
+    }
+
+    .categoria-card-header .emoji {
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(20px, 20px); }
+    }
+
+    .categoria-card-body {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .categoria-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.3px;
+    }
+
+    .categoria-card-text {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .categoria-card-count {
+        display: inline-block;
+        background-color: rgba(59, 130, 246, 0.15);
+        color: var(--accent-blue);
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .categorias-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.8rem;
+        margin-top: 2rem;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .dashboard-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin-top: 0.5rem;
+        letter-spacing: 0.3px;
+    }
+
+    .categoria-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+    .categoria-card-link:hover {
+        text-decoration: none;
+    }
+
+    .alert {
+        background-color: rgba(59, 130, 246, 0.1);
+        border: 1px solid var(--dark-border);
+        color: var(--text-primary);
+    }
+
+    .alert a {
+        color: var(--accent-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 class="page-title"><i class="fas fa-th"></i> Catálogo de Productos</h1>
+    <p class="dashboard-subtitle">Selecciona una categoría para ver los productos disponibles</p>
+</div>
+
+{% if categorias %}
+    <div class="categorias-grid">
+        {% for categoria in categorias %}
+            <div class="categoria-card">
+                <a href="{% url 'catalogo:productos_categoria' categoria.id %}" class="categoria-card-link">
+                    <div class="categoria-card-header">
+                        <span class="emoji">{{ categoria.icono_emoji }}</span>
+                    </div>
+                    <div class="categoria-card-body">
+                        <h5 class="categoria-card-title">{{ categoria.nombre }}</h5>
+                        {% if categoria.descripcion %}
+                            <p class="categoria-card-text">{{ categoria.descripcion|truncatewords:10 }}</p>
+                        {% endif %}
+                        <span class="categoria-card-count">
+                            <i class="fas fa-box"></i> {{ categoria.productos.count }} productos
+                        </span>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>No hay categorías disponibles.</strong>
+        {% if user.is_staff %}
+            <br>Accede al <a href="{% url 'admin:catalogo_categoria_add' %}">panel de administración</a> para crear categorías.
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

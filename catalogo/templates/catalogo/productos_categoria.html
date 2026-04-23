@@ -1,0 +1,347 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}{{ categoria.nombre }} - Productos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .categoria-header {
+        background-color: #25386b;
+        color: var(--text-primary);
+        padding: 2.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        border: 1px solid var(--dark-border);
+    }
+
+    .categoria-header-emoji {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .categoria-header-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .categoria-header-count {
+        font-size: 1rem;
+        color: rgb(224, 224, 224);
+    }
+
+    .tabla-productos {
+        background-color: #d9d9d9 !important;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--dark-border);
+    }
+
+    .table-header {
+        border: none;
+        padding: 1.25rem 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        color: #111111 !important;
+        background-color: #b0b0b0 !important;
+    }
+
+    .table thead {
+        background-color: #b0b0b0 !important;
+    }
+
+    .table thead tr {
+        background-color: #b0b0b0 !important;
+    }
+
+    .table thead tr th {
+        background-color: #b0b0b0 !important;
+        color: #111111 !important;
+    }
+
+    .table-header th {
+        border: none;
+        padding: 1.25rem 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+    }
+
+    .table {
+        background-color: #e8e8e8;
+        color: #111111;
+        margin-bottom: 0;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid var(--dark-border);
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(59, 130, 246, 0.15);
+    }
+
+    .table tbody td {
+        background-color: #d9d9d9 !important;
+        padding: 1.1rem 1rem;
+        vertical-align: middle;
+        border: none;
+    }
+
+    .table tbody tr:nth-child(even) td {
+        background-color: #d9d9d9 !important;
+    }
+
+
+    .table tbody tr:hover td {
+        background-color: #cccccc !important;
+    }
+
+    .producto-nombre {
+        font-weight: 600;
+        color: #111111 !important;
+        font-size: 0.95rem;
+    }
+
+    .producto-marca {
+        color: #333333 !important;
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+    }
+
+    .producto-gramaje {
+        background-color: rgba(59, 130, 246, 0.1);
+        padding: 0.3rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        color: var(--accent-blue);
+        display: inline-block;
+        margin: 0.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .precio-paquete {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--accent-green);
+    }
+
+    .stock-badge {
+        display: inline-block;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        border: 1px solid currentColor;
+    }
+
+    .stock-alto {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .stock-medio {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--accent-yellow);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .stock-bajo {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--accent-red);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .stock-agotado {
+        background-color: rgba(107, 114, 128, 0.1);
+        color: var(--text-secondary);
+        border-color: rgba(107, 114, 128, 0.3);
+    }
+
+    .paquete-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .tipo-paquete-badge {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .piezas-badge {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--accent-yellow);
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .sin-productos {
+        text-align: center;
+        padding: 3rem 2rem;
+        background-color: var(--dark-tertiary);
+        border-radius: 12px;
+        color: var(--text-secondary);
+        border: 1px solid var(--dark-border);
+    }
+
+    .sin-productos i {
+        font-size: 2.5rem;
+        color: var(--text-secondary);
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+
+    .sin-productos h4 {
+        color: var(--text-primary);
+    }
+
+    .sin-productos a {
+        color: var(--accent-blue);
+    }
+
+    .breadcrumb-custom {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+
+    .breadcrumb-custom a {
+        color: var(--accent-blue);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb-custom a:hover {
+        color: var(--text-primary);
+    }
+
+    /* Bootstrap table dark mode */
+    .table-hover tbody tr:hover {
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="breadcrumb-custom">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'catalogo:dashboard' %}">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+        </li>
+        <li class="breadcrumb-item active">{{ categoria.nombre }}</li>
+    </ol>
+</nav>
+
+<!-- Header de Categoría -->
+<div class="categoria-header">
+    <div class="categoria-header-emoji">{{ categoria.icono_emoji }}</div>
+    <h1 class="categoria-header-title">{{ categoria.nombre }}</h1>
+    {% if categoria.descripcion %}
+    <p style="margin-bottom: 0.5rem;">{{ categoria.descripcion }}</p>
+    {% endif %}
+    <div class="categoria-header-count">
+        <i class="fas fa-box"></i> {{ productos.count }} productos disponibles
+    </div>
+</div>
+
+<!-- Tabla de Productos -->
+{% if productos %}
+<div class="tabla-productos">
+    <table class="table table-hover mb-0">
+        <thead class="table-header">
+            <tr>
+                <th><i class="fas fa-tag"></i> Producto</th>
+                <th><i class="fas fa-cube"></i> Presentación</th>
+                <th><i class="fas fa-box"></i> Paquete</th>
+                <th><i class="fas fa-money-bill"></i> Precio</th>
+                <th><i class="fas fa-warehouse"></i> Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <!-- Nombre y Marca -->
+                <td>
+                    <div class="producto-nombre">{{ producto.nombre }}</div>
+                    <div class="producto-marca">
+                        <i class="fas fa-industry"></i> {{ producto.marca }}
+                    </div>
+                </td>
+
+                <!-- Presentación -->
+                <td>
+                    <span class="producto-gramaje">
+                        <i class="fas fa-vial"></i> {{ producto.gramaje }}
+                    </span>
+                </td>
+
+                <!-- Información del Paquete -->
+                <td>
+                    <div class="paquete-info">
+                        <span class="tipo-paquete-badge">{{ producto.tipo_paquete }}</span>
+                        <span class="piezas-badge">
+                            <i class="fas fa-cubes"></i> {{ producto.piezas_por_paquete }} pzs
+                        </span>
+                    </div>
+                </td>
+
+                <!-- Precio -->
+                <td>
+                    <span class="precio-paquete">${{ producto.precio|floatformat:2 }}</span>
+                    <div style="font-size: 0.85rem; color: #7f8c8d;">por paquete</div>
+                </td>
+
+                <!-- Stock -->
+                <td>
+                    {% if producto.stock > 20 %}
+                    <span class="stock-badge stock-alto">
+                        <i class="fas fa-check-circle"></i> {{ producto.stock }} paq.
+                    </span>
+                    {% elif producto.stock > 10 %}
+                    <span class="stock-badge stock-medio">
+                        <i class="fas fa-exclamation-triangle"></i> {{ producto.stock }} paq.
+                    </span>
+                    {% elif producto.stock > 0 %}
+                    <span class="stock-badge stock-bajo">
+                        <i class="fas fa-exclamation-circle"></i> {{ producto.stock }} paq.
+                    </span>
+                    {% else %}
+                    <span class="stock-badge stock-agotado">
+                        <i class="fas fa-times-circle"></i> Agotado
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="sin-productos">
+    <div><i class="fas fa-inbox"></i></div>
+    <h4>No hay productos disponibles en esta categoría</h4>
+    <p>Por favor, intenta con otra categoría o vuelve al <a href="{% url 'catalogo:dashboard' %}">catálogo</a></p>
+</div>
+{% endif %}
+{% endblock %}
