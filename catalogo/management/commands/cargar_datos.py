@@ -19,6 +19,110 @@ class Command(BaseCommand):
             Categoria.objects.all().delete()
             self.stdout.write(self.style.SUCCESS('Datos existentes eliminados.'))
 
+        # Crear categorías
+        self.stdout.write(self.style.HTTP_INFO('Creando categorías...'))
+        
+        categorias_data = [
+            {'nombre': 'Aceites y Grasas', 'descripcion': 'Aceites de oliva, maíz y otros', 'emoji': '🫒'},
+            {'nombre': 'Bebidas', 'descripcion': 'Refrescos, jugos y bebidas diversas', 'emoji': '🥤'},
+            {'nombre': 'Alimentos Secos', 'descripcion': 'Arroz, pasta, harina y legumbres', 'emoji': '🌾'},
+            {'nombre': 'Productos Lácteos', 'descripcion': 'Leche, queso, yogurt y derivados', 'emoji': '🧀'},
+            {'nombre': 'Carnes y Embutidos', 'descripcion': 'Carne, pollo, jamón y embutidos', 'emoji': '🥩'},
+            {'nombre': 'Salsas y Condimentos', 'descripcion': 'Salsa, mayonesa, mostaza y especies', 'emoji': '🍯'},
+            {'nombre': 'Conservas', 'descripcion': 'Productos enlatados y preservados', 'emoji': '🥫'},
+            {'nombre': 'Snacks', 'descripcion': 'Botanas, papas y productos de piqueo', 'emoji': '🥨'},
+        ]
+        
+        categorias = {}
+        for cat_data in categorias_data:
+            cat, created = Categoria.objects.get_or_create(
+                nombre=cat_data['nombre'],
+                defaults={
+                    'descripcion': cat_data['descripcion'],
+                    'icono_emoji': cat_data['emoji']
+                }
+            )
+            categorias[cat_data['nombre']] = cat
+            if created:
+                self.stdout.write(f"  ✓ Categoría '{cat.nombre}' creada")
+            else:
+                self.stdout.write(f"  ℹ Categoría '{cat.nombre}' ya existe")
+        
+        # Crear productos
+        self.stdout.write(self.style.HTTP_INFO('\nCreando productos...'))
+        
+        productos_data = [
+            # Aceites y Grasas
+            {'nombre': 'Aceite de Oliva Extra Virgen', 'marca': 'Gallo', 'gramaje': '1000ml', 'categoria': 'Aceites y Grasas', 'tipo': 'Botella', 'piezas': 12, 'precio': 250.00, 'stock': 150},
+            {'nombre': 'Aceite de Maíz', 'marca': 'La Costeña', 'gramaje': '900ml', 'categoria': 'Aceites y Grasas', 'tipo': 'Botella', 'piezas': 12, 'precio': 120.00, 'stock': 200},
+            {'nombre': 'Mantequilla Premium', 'marca': 'Lala', 'gramaje': '250g', 'categoria': 'Productos Lácteos', 'tipo': 'Caja', 'piezas': 15, 'precio': 180.00, 'stock': 100},
+            
+            # Bebidas
+            {'nombre': 'Refresco Cola', 'marca': 'Coca-Cola', 'gramaje': '1.5L', 'categoria': 'Bebidas', 'tipo': 'Botella', 'piezas': 6, 'precio': 45.00, 'stock': 300},
+            {'nombre': 'Refresco Naranja', 'marca': 'Fanta', 'gramaje': '1.5L', 'categoria': 'Bebidas', 'tipo': 'Botella', 'piezas': 6, 'precio': 40.00, 'stock': 250},
+            {'nombre': 'Agua Embotellada', 'marca': 'Bonafont', 'gramaje': '500ml', 'categoria': 'Bebidas', 'tipo': 'Paquete', 'piezas': 24, 'precio': 60.00, 'stock': 500},
+            {'nombre': 'Jugo Natural', 'marca': 'Del Valle', 'gramaje': '1L', 'categoria': 'Bebidas', 'tipo': 'Botella', 'piezas': 12, 'precio': 35.00, 'stock': 180},
+            
+            # Alimentos Secos
+            {'nombre': 'Arroz Blanco', 'marca': 'Integral', 'gramaje': '5kg', 'categoria': 'Alimentos Secos', 'tipo': 'Bolsa', 'piezas': 4, 'precio': 180.00, 'stock': 120},
+            {'nombre': 'Frijol Negro', 'marca': 'Silueta', 'gramaje': '1kg', 'categoria': 'Alimentos Secos', 'tipo': 'Bolsa', 'piezas': 10, 'precio': 45.00, 'stock': 200},
+            {'nombre': 'Pasta Integral', 'marca': 'Barilla', 'gramaje': '500g', 'categoria': 'Alimentos Secos', 'tipo': 'Caja', 'piezas': 20, 'precio': 25.00, 'stock': 300},
+            {'nombre': 'Harina de Trigo', 'marca': 'Pillsbury', 'gramaje': '1kg', 'categoria': 'Alimentos Secos', 'tipo': 'Bolsa', 'piezas': 15, 'precio': 35.00, 'stock': 250},
+            
+            # Productos Lácteos
+            {'nombre': 'Leche Entera', 'marca': 'Lala', 'gramaje': '1L', 'categoria': 'Productos Lácteos', 'tipo': 'Caja', 'piezas': 6, 'precio': 28.00, 'stock': 400},
+            {'nombre': 'Queso Oaxaca', 'marca': 'Santa Rosa', 'gramaje': '500g', 'categoria': 'Productos Lácteos', 'tipo': 'Empaque', 'piezas': 8, 'precio': 120.00, 'stock': 80},
+            {'nombre': 'Yogurt Natural', 'marca': 'Yoplait', 'gramaje': '500g', 'categoria': 'Productos Lácteos', 'tipo': 'Vaso', 'piezas': 6, 'precio': 40.00, 'stock': 150},
+            
+            # Carnes y Embutidos
+            {'nombre': 'Jamón Premium', 'marca': 'Zwan', 'gramaje': '500g', 'categoria': 'Carnes y Embutidos', 'tipo': 'Paquete', 'piezas': 8, 'precio': 110.00, 'stock': 100},
+            {'nombre': 'Salchicha', 'marca': 'Zwan', 'gramaje': '450g', 'categoria': 'Carnes y Embutidos', 'tipo': 'Paquete', 'piezas': 10, 'precio': 85.00, 'stock': 120},
+            {'nombre': 'Tocino', 'marca': 'De La Rosa', 'gramaje': '500g', 'categoria': 'Carnes y Embutidos', 'tipo': 'Paquete', 'piezas': 6, 'precio': 95.00, 'stock': 80},
+            
+            # Salsas y Condimentos
+            {'nombre': 'Salsa de Tomate', 'marca': 'La Costeña', 'gramaje': '500g', 'categoria': 'Salsas y Condimentos', 'tipo': 'Lata', 'piezas': 24, 'precio': 25.00, 'stock': 300},
+            {'nombre': 'Mayonesa', 'marca': 'Hellmanns', 'gramaje': '500g', 'categoria': 'Salsas y Condimentos', 'tipo': 'Frasco', 'piezas': 12, 'precio': 35.00, 'stock': 150},
+            {'nombre': 'Mostaza', 'marca': 'French', 'gramaje': '400g', 'categoria': 'Salsas y Condimentos', 'tipo': 'Frasco', 'piezas': 12, 'precio': 20.00, 'stock': 200},
+            {'nombre': 'Salsa Picante', 'marca': 'Tabasco', 'gramaje': '150ml', 'categoria': 'Salsas y Condimentos', 'tipo': 'Frasco', 'piezas': 24, 'precio': 45.00, 'stock': 180},
+            
+            # Conservas
+            {'nombre': 'Atún en Lata', 'marca': 'Van de Camps', 'gramaje': '140g', 'categoria': 'Conservas', 'tipo': 'Lata', 'piezas': 48, 'precio': 18.00, 'stock': 500},
+            {'nombre': 'Chícharos Enlatados', 'marca': 'La Costeña', 'gramaje': '425g', 'categoria': 'Conservas', 'tipo': 'Lata', 'piezas': 24, 'precio': 15.00, 'stock': 250},
+            {'nombre': 'Maíz Dulce', 'marca': 'Clásico', 'gramaje': '420g', 'categoria': 'Conservas', 'tipo': 'Lata', 'piezas': 24, 'precio': 14.00, 'stock': 280},
+            {'nombre': 'Frijoles Refritos', 'marca': 'La Costeña', 'gramaje': '430g', 'categoria': 'Conservas', 'tipo': 'Lata', 'piezas': 24, 'precio': 16.00, 'stock': 300},
+            
+            # Snacks
+            {'nombre': 'Papas Fritas Saladas', 'marca': 'Sabritas', 'gramaje': '35g', 'categoria': 'Snacks', 'tipo': 'Bolsa', 'piezas': 50, 'precio': 15.00, 'stock': 400},
+            {'nombre': 'Cacahuates Tostados', 'marca': 'La Costeña', 'gramaje': '250g', 'categoria': 'Snacks', 'tipo': 'Bolsa', 'piezas': 12, 'precio': 30.00, 'stock': 200},
+            {'nombre': 'Galletas de Soda', 'marca': 'Gamesa', 'gramaje': '600g', 'categoria': 'Snacks', 'tipo': 'Paquete', 'piezas': 12, 'precio': 35.00, 'stock': 250},
+        ]
+        
+        productos_creados = 0
+        for prod_data in productos_data:
+            categoria = categorias[prod_data['categoria']]
+            
+            producto, created = Producto.objects.get_or_create(
+                nombre=prod_data['nombre'],
+                marca=prod_data['marca'],
+                gramaje=prod_data['gramaje'],
+                defaults={
+                    'categoria': categoria,
+                    'tipo_paquete': prod_data['tipo'],
+                    'piezas_por_paquete': prod_data['piezas'],
+                    'precio': Decimal(str(prod_data['precio'])),
+                    'stock': prod_data['stock'],
+                    'activo': True,
+                    'descripcion': f"{prod_data['marca']} - {prod_data['gramaje']} - {prod_data['tipo']} de {prod_data['piezas']} piezas"
+                }
+            )
+            
+            if created:
+                productos_creados += 1
+                self.stdout.write(f"  ✓ Producto '{producto.nombre}' creado")
+        
+        self.stdout.write(self.style.SUCCESS(f'\n✅ Carga completada: {productos_creados} productos nuevos cargados'))
+
+
         # Datos de categorías y productos
         datos = {
             ('🥤 Refrescos y Bebidas Carbonatadas', '🥤'): [

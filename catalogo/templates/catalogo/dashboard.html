@@ -1,9 +1,30 @@
 {% extends "catalogo/base.html" %}
+{% load static %}
 
 {% block title %}Dashboard - Catálogo de Productos{% endblock %}
 
 {% block extra_css %}
 <style>
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+    }
+
+    .dashboard-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin-top: 0.5rem;
+        letter-spacing: 0.3px;
+    }
+
+    .categorias-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.8rem;
+        margin-top: 2rem;
+    }
+
     .categoria-card {
         transition: all 0.3s ease;
         border: 1px solid var(--dark-border);
@@ -22,7 +43,7 @@
     }
 
     .categoria-card-header {
-        background: #25386b 0%;
+        background: linear-gradient(135deg, #25386b 0%, #1a2847 100%);
         height: 180px;
         display: flex;
         align-items: center;
@@ -32,26 +53,15 @@
         overflow: hidden;
     }
 
-    .categoria-card-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-        background-size: 20px 20px;
-        animation: float 25s infinite linear;
-    }
-
     .categoria-card-header .emoji {
         position: relative;
         z-index: 1;
+        animation: bounce 2s infinite;
     }
 
-    @keyframes float {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(20px, 20px); }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
     }
 
     .categoria-card-body {
@@ -85,25 +95,6 @@
         border: 1px solid rgba(59, 130, 246, 0.3);
     }
 
-    .categorias-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 1.8rem;
-        margin-top: 2rem;
-    }
-
-    .dashboard-header {
-        text-align: center;
-        margin-bottom: 3rem;
-    }
-
-    .dashboard-subtitle {
-        color: var(--text-secondary);
-        font-size: 1.05rem;
-        margin-top: 0.5rem;
-        letter-spacing: 0.3px;
-    }
-
     .categoria-card-link {
         text-decoration: none;
         color: inherit;
@@ -114,22 +105,14 @@
     .categoria-card-link:hover {
         text-decoration: none;
     }
-
-    .alert {
-        background-color: rgba(59, 130, 246, 0.1);
-        border: 1px solid var(--dark-border);
-        color: var(--text-primary);
-    }
-
-    .alert a {
-        color: var(--accent-blue);
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-header">
-    <h1 class="page-title"><i class="fas fa-th"></i> Catálogo de Productos</h1>
+    <h1 class="border-bottom-accent pb-3">
+        <i class="fas fa-th"></i> Catálogo de Productos
+    </h1>
     <p class="dashboard-subtitle">Selecciona una categoría para ver los productos disponibles</p>
 </div>
 
@@ -158,9 +141,10 @@
     <div class="alert alert-info alert-dismissible fade show" role="alert">
         <i class="fas fa-info-circle"></i> 
         <strong>No hay categorías disponibles.</strong>
-        {% if user.is_staff %}
-            <br>Accede al <a href="{% url 'admin:catalogo_categoria_add' %}">panel de administración</a> para crear categorías.
-        {% endif %}
+        <br>
+        <small>Ejecuta en terminal: <code>python manage.py cargar_datos</code></small>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 {% endif %}
 {% endblock %}
+

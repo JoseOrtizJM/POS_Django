@@ -1,0 +1,130 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administración - POS{% endblock %}
+
+{% block content %}
+<div class="my-4">
+    <h1 class="border-bottom-accent pb-3 mb-4">
+        <i class="fas fa-cog"></i> Panel de Administración
+    </h1>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-box" style="font-size: 2rem; color: var(--accent-blue);"></i>
+                    <h3 class="mt-3">{{ total_productos }}</h3>
+                    <p class="text-muted mb-0">Productos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users" style="font-size: 2rem; color: var(--accent-green);"></i>
+                    <h3 class="mt-3">{{ total_usuarios }}</h3>
+                    <p class="text-muted mb-0">Usuarios</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-list" style="font-size: 2rem; color: var(--accent-yellow);"></i>
+                    <h3 class="mt-3">{{ total_categorias }}</h3>
+                    <p class="text-muted mb-0">Categorías</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de acciones rápidas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-3">Acciones Rápidas</h5>
+            <a href="{% url 'catalogo:crear_producto' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+            <a href="{% url 'catalogo:listar_usuarios' %}" class="btn btn-info">
+                <i class="fas fa-users"></i> Ver Usuarios
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de productos recientes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: var(--dark-secondary);">
+                    <h5 class="mb-0">
+                        <i class="fas fa-box"></i> Productos Registrados
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if productos %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for producto in productos|slice:":5" %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ producto.nombre }}</strong><br>
+                                                <small class="text-muted">{{ producto.marca }} - {{ producto.gramaje }}</small>
+                                            </td>
+                                            <td>{{ producto.categoria.nombre }}</td>
+                                            <td>
+                                                <strong style="color: var(--accent-green);">
+                                                    ${{ producto.precio }}
+                                                </strong>
+                                            </td>
+                                            <td>{{ producto.stock }}</td>
+                                            <td>
+                                                {% if producto.activo %}
+                                                    <span class="badge badge-success">Activo</span>
+                                                {% else %}
+                                                    <span class="badge badge-danger">Inactivo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'catalogo:editar_producto' producto.id %}" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{% url 'catalogo:eliminar_producto' producto.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 text-center">
+                            <a href="#" class="btn btn-secondary btn-sm">Ver todos los productos</a>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-inbox" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No hay productos registrados</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
