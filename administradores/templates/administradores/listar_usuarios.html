@@ -19,7 +19,7 @@
             </div>
             <div class="col-md-4">
                 <input type="text" id="busqueda-usuario" class="form-control form-control-sm"
-                       placeholder="Buscar por nombre, correo o teléfono...">
+                       placeholder="Buscar por nombre, correo...">
             </div>
         </div>
     </div>
@@ -32,10 +32,11 @@
                         <th>Usuario</th>
                         <th>Correo</th>
                         <th>Teléfono</th>
-                        <th>Ciudad / País</th>
-                        <th>Pago</th>
+                        <th>Ciudad</th>
+                        <th>Ventas</th>
                         <th>Estado</th>
                         <th>Registro</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,11 +54,7 @@
                             <small class="d-block text-muted">{{ usuario.get_pais_display }}</small>
                         </td>
                         <td>
-                            {% if usuario.metodo_pago_preferido == 'tarjeta' %}
-                                <i class="fas fa-credit-card text-primary"></i> Tarjeta
-                            {% else %}
-                                <i class="fas fa-money-bill text-success"></i> Efectivo
-                            {% endif %}
+                            <span class="badge bg-primary">{{ usuario.num_ventas }}</span>
                         </td>
                         <td>
                             {% if usuario.activo %}
@@ -69,10 +66,25 @@
                         <td>
                             <small>{{ usuario.creado_en|date:"d/m/Y" }}</small>
                         </td>
+                        <td>
+                            <form method="post" action="{% url 'administradores:toggle_usuario' usuario.id %}"
+                                  onsubmit="return confirm('¿{% if usuario.activo %}Desactivar{% else %}Activar{% endif %} a &quot;{{ usuario.nombre_usuario }}&quot;?');">
+                                {% csrf_token %}
+                                {% if usuario.activo %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Desactivar">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Activar">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                {% endif %}
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">No hay usuarios registrados aún.</td>
+                        <td colspan="9" class="text-center py-4 text-muted">No hay usuarios registrados aún.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,7 +97,14 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    initTablaBusqueda('tabla-usuarios', 'busqueda-usuario');
+    const input = document.getElementById('busqueda-usuario');
+    const filas = document.querySelectorAll('#tabla-usuarios tbody tr');
+    input.addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        filas.forEach(function (fila) {
+            fila.style.display = fila.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
 });
 </script>
 {% endblock %}

@@ -13,51 +13,68 @@
 
 <!-- Tarjetas de estadísticas -->
 <div class="row g-4 mb-5">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card stat-card stat-card-blue h-100">
             <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-primary-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-box-open fa-lg" style="color:var(--accent-primary);"></i>
+                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-primary-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-box-open" style="color:var(--accent-primary);"></i>
                 </div>
                 <div>
-                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Productos</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_productos }}</h2>
+                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Productos</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_productos }}</h2>
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{% url 'catalogo:dashboard' %}" class="btn btn-sm btn-outline-primary">Ver catálogo</a>
+                <a href="{% url 'administradores:listar_productos' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card stat-card stat-card-green h-100">
             <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-success-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-users fa-lg" style="color:var(--accent-success);"></i>
+                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-success-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-users" style="color:var(--accent-success);"></i>
                 </div>
                 <div>
-                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Clientes</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_usuarios }}</h2>
+                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Clientes</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_usuarios }}</h2>
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{% url 'administradores:listar_usuarios' %}" class="btn btn-sm btn-outline-success">Ver usuarios</a>
+                <a href="{% url 'administradores:listar_usuarios' %}" class="btn btn-sm btn-outline-success">Ver todos</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card stat-card stat-card-amber h-100">
             <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-warning-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-tags fa-lg" style="color:var(--accent-warning);"></i>
+                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-warning-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-tags" style="color:var(--accent-warning);"></i>
                 </div>
                 <div>
-                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Categorías</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_categorias }}</h2>
+                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Categorías</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_categorias }}</h2>
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{% url 'catalogo:dashboard' %}" class="btn btn-sm btn-outline-secondary">Ver catálogo</a>
+                <a href="{% url 'administradores:listar_categorias' %}" class="btn btn-sm btn-outline-secondary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100" style="border-color:var(--accent-danger);">
+            <div class="card-body py-4 d-flex align-items-center gap-4">
+                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-danger-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-receipt" style="color:var(--accent-danger);"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Ventas hoy</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ ventas_hoy }}</h2>
+                    <small style="color:var(--accent-success);">${{ total_ventas_hoy|floatformat:2 }}</small>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'administradores:ventas_dia' %}" class="btn btn-sm btn-outline-danger">Ver ventas</a>
             </div>
         </div>
     </div>
@@ -67,9 +84,10 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-clock"></i> Productos Recientes</h5>
-        <a href="{% url 'administradores:crear_producto' %}" class="btn btn-sm btn-success">
-            <i class="fas fa-plus"></i> Agregar
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'administradores:listar_productos' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            <a href="{% url 'administradores:crear_producto' %}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Agregar</a>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -96,7 +114,7 @@
                             {% if producto.stock > 10 %}
                                 <span class="badge bg-success">{{ producto.stock }} paq.</span>
                             {% elif producto.stock > 0 %}
-                                <span class="badge bg-warning text-dark">{{ producto.stock }} paq.</span>
+                                <span class="badge bg-warning">{{ producto.stock }} paq.</span>
                             {% else %}
                                 <span class="badge bg-danger">Agotado</span>
                             {% endif %}

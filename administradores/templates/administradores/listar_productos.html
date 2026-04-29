@@ -1,0 +1,95 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Productos - POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1><i class="fas fa-boxes"></i> Gestión de Productos</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Panel
+        </a>
+        <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </a>
+    </div>
+</div>
+
+{% for categoria in categorias %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ categoria.icono_emoji }} {{ categoria.nombre }}</h5>
+        <span class="badge bg-primary">{{ categoria.productos.count }} producto(s)</span>
+    </div>
+    <div class="card-body p-0">
+        {% if categoria.productos.all %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre / Marca</th>
+                        <th>Gramaje</th>
+                        <th>Paquete</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in categoria.productos.all %}
+                    <tr>
+                        <td>
+                            <strong>{{ producto.nombre }}</strong>
+                            <small class="d-block text-muted">{{ producto.marca }}</small>
+                        </td>
+                        <td><span style="font-size:.85rem;">{{ producto.gramaje }}</span></td>
+                        <td>
+                            <small>{{ producto.tipo_paquete }} · {{ producto.piezas_por_paquete }} pzs</small>
+                        </td>
+                        <td><strong>${{ producto.precio|floatformat:2 }}</strong></td>
+                        <td>
+                            {% if producto.stock > 20 %}
+                                <span class="badge bg-success">{{ producto.stock }} paq.</span>
+                            {% elif producto.stock > 0 %}
+                                <span class="badge bg-warning">{{ producto.stock }} paq.</span>
+                            {% else %}
+                                <span class="badge bg-danger">Agotado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'administradores:editar_producto' producto.id %}"
+                               class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'administradores:eliminar_producto' producto.id %}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar &quot;{{ producto.nombre }}&quot;?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3 mb-0">Sin productos en esta categoría.</p>
+        {% endif %}
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+        <h4 class="text-muted">No hay categorías creadas</h4>
+        <a href="{% url 'administradores:crear_categoria' %}" class="btn btn-primary mt-2">
+            <i class="fas fa-plus"></i> Crear primera categoría
+        </a>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

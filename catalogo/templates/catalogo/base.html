@@ -44,13 +44,23 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'administradores:crear_producto' %}">
-                                            <i class="fas fa-plus"></i> Nuevo Producto
+                                        <a class="dropdown-item" href="{% url 'administradores:listar_productos' %}">
+                                            <i class="fas fa-boxes"></i> Productos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:listar_categorias' %}">
+                                            <i class="fas fa-tags"></i> Categorías
                                         </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item" href="{% url 'administradores:listar_usuarios' %}">
                                             <i class="fas fa-users"></i> Usuarios
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:ventas_dia' %}">
+                                            <i class="fas fa-receipt"></i> Ventas del Día
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>

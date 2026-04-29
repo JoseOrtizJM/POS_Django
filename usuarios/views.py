@@ -237,8 +237,29 @@ def checkout(request):
                 'carrito': carrito, 'items': items, 'tarjetas': tarjetas,
             })
 
-        # Confirmar pedido — limpiar carrito
+        from ventas.models import Venta, VentaItem
         total = carrito.total()
+
+        venta = Venta.objects.create(
+            usuario=usuario,
+            total=total,
+            metodo_pago=metodo,
+            detalle_pago=detalle_pago,
+        )
+
+        for item in items:
+            VentaItem.objects.create(
+                venta=venta,
+                producto=item.producto,
+                nombre_producto=item.producto.nombre,
+                precio_unitario=item.producto.precio,
+                cantidad=item.cantidad,
+                subtotal=item.subtotal(),
+            )
+            prod = item.producto
+            prod.stock = max(0, prod.stock - item.cantidad)
+            prod.save()
+
         carrito.items.all().delete()
 
         messages.success(

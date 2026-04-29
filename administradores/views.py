@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.db.models import Sum, Count
+from django.utils import timezone
 from functools import wraps
 from .models import Administrador
 from .forms import LoginAdminForm
@@ -59,14 +61,32 @@ def logout_view(request):
 
 @admin_requerido
 def panel(request):
+    from ventas.models import Venta
+    hoy = timezone.localdate()
+    ventas_hoy = Venta.objects.filter(fecha__date=hoy)
+    total_ventas_hoy = ventas_hoy.aggregate(t=Sum('total'))['t'] or 0
+
     contexto = {
         'titulo': 'Panel de Administración',
         'total_productos': Producto.objects.count(),
         'total_usuarios': Usuario.objects.count(),
         'total_categorias': Categoria.objects.count(),
+        'ventas_hoy': ventas_hoy.count(),
+        'total_ventas_hoy': total_ventas_hoy,
         'productos_recientes': Producto.objects.select_related('categoria').order_by('-creado_en')[:5],
     }
     return render(request, 'administradores/panel.html', contexto)
+
+
+# ==================== PRODUCTOS ====================
+
+@admin_requerido
+def listar_productos(request):
+    categorias = Categoria.objects.prefetch_related('productos').order_by('nombre')
+    return render(request, 'administradores/listar_productos.html', {
+        'categorias': categorias,
+        'titulo': 'Gestión de Productos',
+    })
 
 
 @admin_requerido
@@ -89,7 +109,7 @@ def crear_producto(request):
                 producto.imagen = request.FILES['imagen']
             producto.save()
             messages.success(request, f'Producto "{producto.nombre}" creado exitosamente.')
-            return redirect('administradores:panel')
+            return redirect('administradores:listar_productos')
         except Exception as e:
             messages.error(request, f'Error al crear producto: {e}')
 
@@ -116,7 +136,7 @@ def editar_producto(request, producto_id):
                 producto.imagen = request.FILES['imagen']
             producto.save()
             messages.success(request, f'Producto "{producto.nombre}" actualizado.')
-            return redirect('administradores:panel')
+            return redirect('administradores:listar_productos')
         except Exception as e:
             messages.error(request, f'Error al actualizar: {e}')
 
@@ -134,13 +154,122 @@ def eliminar_producto(request, producto_id):
     nombre = producto.nombre
     producto.delete()
     messages.success(request, f'Producto "{nombre}" eliminado.')
-    return redirect('administradores:panel')
+    return redirect('administradores:listar_productos')
+
+
+# ==================== CATEGORÍAS ====================
+
+@admin_requerido
+def listar_categorias(request):
+    categorias = Categoria.objects.annotate(num_productos=Count('productos')).order_by('nombre')
+    return render(request, 'administradores/listar_categorias.html', {
+        'categorias': categorias,
+        'titulo': 'Gestión de Categorías',
+    })
 
 
 @admin_requerido
+def crear_categoria(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        if not nombre:
+            messages.error(request, 'El nombre es requerido.')
+        else:
+            try:
+                cat = Categoria(
+                    nombre=nombre,
+                    descripcion=request.POST.get('descripcion', ''),
+                    icono_emoji=request.POST.get('icono_emoji', '📦') or '📦',
+                )
+                if 'imagen' in request.FILES:
+                    cat.imagen = request.FILES['imagen']
+                cat.save()
+                messages.success(request, f'Categoría "{nombre}" creada.')
+                return redirect('administradores:listar_categorias')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+    return render(request, 'administradores/crear_categoria.html', {'titulo': 'Nueva Categoría'})
+
+
+@admin_requerido
+def editar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        if not nombre:
+            messages.error(request, 'El nombre es requerido.')
+        else:
+            try:
+                categoria.nombre = nombre
+                categoria.descripcion = request.POST.get('descripcion', '')
+                categoria.icono_emoji = request.POST.get('icono_emoji', '📦') or '📦'
+                if 'imagen' in request.FILES:
+                    categoria.imagen = request.FILES['imagen']
+                categoria.save()
+                messages.success(request, f'Categoría "{nombre}" actualizada.')
+                return redirect('administradores:listar_categorias')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+    return render(request, 'administradores/editar_categoria.html', {
+        'categoria': categoria,
+        'titulo': 'Editar Categoría',
+    })
+
+
+@admin_requerido
+@require_POST
+def eliminar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    nombre = categoria.nombre
+    num_productos = categoria.productos.count()
+    categoria.delete()
+    messages.success(request, f'Categoría "{nombre}" y {num_productos} producto(s) eliminados.')
+    return redirect('administradores:listar_categorias')
+
+
+# ==================== USUARIOS ====================
+
+@admin_requerido
 def listar_usuarios(request):
-    usuarios = Usuario.objects.all()
+    usuarios = Usuario.objects.annotate(num_ventas=Count('ventas')).order_by('-creado_en')
     return render(request, 'administradores/listar_usuarios.html', {
         'usuarios': usuarios,
         'titulo': 'Gestión de Usuarios',
+    })
+
+
+@admin_requerido
+@require_POST
+def toggle_usuario(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    usuario.activo = not usuario.activo
+    usuario.save()
+    estado = 'activado' if usuario.activo else 'desactivado'
+    messages.success(request, f'Usuario "{usuario.nombre_usuario}" {estado}.')
+    return redirect('administradores:listar_usuarios')
+
+
+# ==================== VENTAS ====================
+
+@admin_requerido
+def ventas_dia(request):
+    from ventas.models import Venta
+    hoy = timezone.localdate()
+    ventas = Venta.objects.filter(fecha__date=hoy).select_related('usuario').prefetch_related('items')
+    total_dia = ventas.aggregate(t=Sum('total'))['t'] or 0
+    return render(request, 'administradores/ventas_dia.html', {
+        'ventas': ventas,
+        'total_dia': total_dia,
+        'hoy': hoy,
+        'titulo': 'Ventas del Día',
+    })
+
+
+@admin_requerido
+def detalle_venta(request, venta_id):
+    from ventas.models import Venta
+    venta = get_object_or_404(Venta, id=venta_id)
+    return render(request, 'administradores/detalle_venta.html', {
+        'venta': venta,
+        'titulo': f'Detalle — Venta #{venta.id}',
     })
