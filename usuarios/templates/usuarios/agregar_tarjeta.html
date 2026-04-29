@@ -1,0 +1,134 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Agregar Tarjeta - POS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <a href="{% if next == 'checkout' %}{% url 'usuarios:checkout' %}{% else %}{% url 'usuarios:mis_tarjetas' %}{% endif %}"
+               class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0"><i class="fas fa-credit-card" style="color:var(--accent-primary);"></i> Nueva Tarjeta</h2>
+        </div>
+
+        <!-- Vista previa visual de la tarjeta -->
+        <div id="card-preview" class="card-visual otro mb-4" style="max-width:340px; margin:0 auto;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <i class="fas fa-sim-card fa-lg" style="color:rgba(255,255,255,.4);"></i>
+                <span id="preview-tipo" style="font-size:.9rem; font-weight:700; color:rgba(255,255,255,.7); text-transform:uppercase;">Tarjeta</span>
+            </div>
+            <div class="card-num" id="preview-numero">•••• •••• •••• ••••</div>
+            <div class="d-flex justify-content-between align-items-flex-end">
+                <div>
+                    <div class="card-holder" id="preview-titular">TITULAR</div>
+                    <div class="card-exp" id="preview-exp">MM/AAAA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <div class="mb-3">
+                        {{ form.nombre_titular.label_tag }}
+                        {{ form.nombre_titular }}
+                        {% if form.nombre_titular.errors %}
+                            <div class="text-danger small mt-1">{% for e in form.nombre_titular.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.numero_tarjeta.label_tag }}
+                        {{ form.numero_tarjeta }}
+                        {% if form.numero_tarjeta.errors %}
+                            <div class="text-danger small mt-1">{% for e in form.numero_tarjeta.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-4">
+                            {{ form.mes_expiracion.label_tag }}
+                            {{ form.mes_expiracion }}
+                        </div>
+                        <div class="col-4">
+                            {{ form.anio_expiracion.label_tag }}
+                            {{ form.anio_expiracion }}
+                        </div>
+                        <div class="col-4">
+                            {{ form.cvv.label_tag }}
+                            {{ form.cvv }}
+                            {% if form.cvv.errors %}
+                                <div class="text-danger small mt-1">{% for e in form.cvv.errors %}{{ e }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>
+                    {% endif %}
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Guardar Tarjeta
+                        </button>
+                    </div>
+                    <p class="text-center mt-3" style="font-size:.8rem; color:var(--text-muted);">
+                        <i class="fas fa-shield-alt"></i> Tus datos están protegidos de forma segura.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const numInput    = document.getElementById('id_numero_tarjeta');
+    const titularInput = document.querySelector('[name="nombre_titular"]');
+    const mesSelect   = document.querySelector('[name="mes_expiracion"]');
+    const anioSelect  = document.querySelector('[name="anio_expiracion"]');
+    const preview     = document.getElementById('card-preview');
+
+    // Formatear número con espacios cada 4 dígitos
+    numInput.addEventListener('input', function () {
+        let val = this.value.replace(/\D/g, '').substring(0, 16);
+        this.value = val.replace(/(.{4})/g, '$1 ').trim();
+        actualizarPreview();
+        actualizarTipo(val);
+    });
+
+    titularInput.addEventListener('input', actualizarPreview);
+    mesSelect.addEventListener('change', actualizarPreview);
+    anioSelect.addEventListener('change', actualizarPreview);
+
+    function actualizarPreview() {
+        const num     = numInput.value || '•••• •••• •••• ••••';
+        const titular = (titularInput.value || 'TITULAR').toUpperCase();
+        const mes     = mesSelect.value || 'MM';
+        const anio    = anioSelect.value || 'AAAA';
+        document.getElementById('preview-numero').textContent = num;
+        document.getElementById('preview-titular').textContent = titular;
+        document.getElementById('preview-exp').textContent = `${mes}/${anio}`;
+    }
+
+    function actualizarTipo(numero) {
+        let tipo = 'otro';
+        let nombre = 'Tarjeta';
+        if (numero.startsWith('4'))                            { tipo = 'visa';       nombre = 'VISA'; }
+        else if (['51','52','53','54','55'].some(p => numero.startsWith(p))) { tipo = 'mastercard'; nombre = 'Mastercard'; }
+        else if (['34','37'].some(p => numero.startsWith(p))) { tipo = 'amex';       nombre = 'Amex'; }
+
+        preview.className = `card-visual ${tipo} mb-4`;
+        document.getElementById('preview-tipo').textContent = nombre;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Mi Carrito - POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1><i class="fas fa-shopping-cart" style="color:var(--accent-primary);"></i> Mi Carrito</h1>
+    <a href="{% url 'catalogo:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Seguir comprando
+    </a>
+</div>
+
+{% if items %}
+<div class="row g-4">
+    <!-- Items del carrito -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-box"></i> Productos ({{ carrito.total_items }} artículo{{ carrito.total_items|pluralize:"s" }})</span>
+            </div>
+            <div class="card-body p-0">
+                {% for item in items %}
+                <div class="d-flex align-items-center gap-3 p-3"
+                     style="border-bottom: 1px solid var(--border);{% if forloop.last %}border-bottom:none;{% endif %}">
+
+                    <!-- Imagen del producto -->
+                    {% if item.producto.imagen %}
+                        <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="carrito-item-img">
+                    {% else %}
+                        <div class="carrito-item-img d-flex align-items-center justify-content-center" style="background:var(--bg-elevated);">
+                            <i class="fas fa-box" style="color:var(--text-muted);"></i>
+                        </div>
+                    {% endif %}
+
+                    <!-- Info del producto -->
+                    <div class="flex-grow-1">
+                        <div style="font-weight:600; color:var(--text-primary); font-size:.9rem;">{{ item.producto.nombre }}</div>
+                        <small style="color:var(--text-secondary);">{{ item.producto.marca }} · {{ item.producto.gramaje }}</small>
+                        <div style="color:var(--accent-success); font-weight:600; margin-top:.25rem;">${{ item.producto.precio }}</div>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <form method="post" action="{% url 'usuarios:actualizar_cantidad' item.id %}" class="d-flex align-items-center gap-2">
+                        {% csrf_token %}
+                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}" class="btn btn-outline-secondary btn-sm" style="padding:.25rem .55rem;">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" name="cantidad" value="{{ item.cantidad }}" min="0" max="{{ item.producto.stock }}"
+                               class="carrito-qty-input form-control form-control-sm"
+                               onchange="this.form.submit()">
+                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}" class="btn btn-outline-secondary btn-sm" style="padding:.25rem .55rem;"
+                                {% if item.cantidad >= item.producto.stock %}disabled{% endif %}>
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </form>
+
+                    <!-- Subtotal -->
+                    <div style="min-width:80px; text-align:right;">
+                        <div style="font-weight:700; color:var(--text-primary);">${{ item.subtotal }}</div>
+                        <small style="color:var(--text-muted);">subtotal</small>
+                    </div>
+
+                    <!-- Eliminar -->
+                    <form method="post" action="{% url 'usuarios:eliminar_del_carrito' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen del pedido -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-receipt"></i> Resumen</div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2" style="color:var(--text-secondary); font-size:.9rem;">
+                    <span>Subtotal ({{ carrito.total_items }} art.)</span>
+                    <span>${{ carrito.total }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2" style="color:var(--text-secondary); font-size:.9rem;">
+                    <span>Envío</span>
+                    <span style="color:var(--accent-success);">A coordinar</span>
+                </div>
+                <hr style="border-color:var(--border);">
+                <div class="d-flex justify-content-between mb-4">
+                    <strong style="font-size:1rem;">Total</strong>
+                    <strong style="font-size:1.2rem; color:var(--accent-success);">${{ carrito.total }}</strong>
+                </div>
+                <a href="{% url 'usuarios:checkout' %}" class="btn btn-success w-100 btn-lg">
+                    <i class="fas fa-lock"></i> Proceder al Pago
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-shopping-cart fa-4x mb-4" style="color:var(--text-muted);"></i>
+    <h3 style="color:var(--text-secondary);">Tu carrito está vacío</h3>
+    <p style="color:var(--text-muted);">Explora el catálogo y agrega productos.</p>
+    <a href="{% url 'catalogo:dashboard' %}" class="btn btn-primary mt-2">
+        <i class="fas fa-th"></i> Ver Catálogo
+    </a>
+</div>
+{% endif %}
+{% endblock %}

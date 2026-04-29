@@ -1,0 +1,72 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Mis Tarjetas - POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1><i class="fas fa-credit-card" style="color:var(--accent-primary);"></i> Mis Tarjetas</h1>
+    <a href="{% url 'usuarios:agregar_tarjeta' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Agregar Tarjeta
+    </a>
+</div>
+
+{% if tarjetas %}
+<div class="row g-4">
+    {% for tarjeta in tarjetas %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <!-- Visualización de la tarjeta -->
+            <div class="card-visual {{ tarjeta.tipo_tarjeta }}" style="border-radius:0; min-height:160px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <i class="fas fa-sim-card fa-lg" style="color:rgba(255,255,255,.4);"></i>
+                    <span style="font-size:.85rem; font-weight:700; color:rgba(255,255,255,.7); text-transform:uppercase;">
+                        {{ tarjeta.get_tipo_tarjeta_display }}
+                    </span>
+                </div>
+                <div class="card-num">•••• •••• •••• {{ tarjeta.ultimos_cuatro }}</div>
+                <div class="d-flex justify-content-between align-items-flex-end">
+                    <div>
+                        <div class="card-holder">{{ tarjeta.nombre_titular }}</div>
+                        <div class="card-exp">{{ tarjeta.mes_expiracion }}/{{ tarjeta.anio_expiracion }}</div>
+                    </div>
+                    {% if tarjeta.es_predeterminada %}
+                    <span style="background:rgba(255,255,255,.2); color:#fff; font-size:.7rem; padding:.2rem .55rem; border-radius:12px; font-weight:600;">
+                        ★ Predeterminada
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                {% if not tarjeta.es_predeterminada %}
+                <form method="post" action="{% url 'usuarios:predeterminar_tarjeta' tarjeta.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-star"></i> Predeterminar
+                    </button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'usuarios:eliminar_tarjeta' tarjeta.id %}"
+                      onsubmit="return confirm('¿Eliminar esta tarjeta?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-credit-card fa-4x mb-4" style="color:var(--text-muted);"></i>
+    <h3 style="color:var(--text-secondary);">No tienes tarjetas guardadas</h3>
+    <p style="color:var(--text-muted);">Agrega una tarjeta para agilizar tus compras.</p>
+    <a href="{% url 'usuarios:agregar_tarjeta' %}" class="btn btn-primary mt-2">
+        <i class="fas fa-plus"></i> Agregar Tarjeta
+    </a>
+</div>
+{% endif %}
+{% endblock %}

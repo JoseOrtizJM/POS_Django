@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'catalogo',
+    'usuarios',
+    'administradores',
+    'categorias',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'POS_Django.context_processors.auth_context',
             ],
         },
     },

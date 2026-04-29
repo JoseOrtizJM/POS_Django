@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from catalogo.models import Categoria, Producto
+from catalogo.models import Producto
+from categorias.models import Categoria
 from decimal import Decimal
 
 class Command(BaseCommand):

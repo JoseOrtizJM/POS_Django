@@ -1,0 +1,127 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administración - POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1><i class="fas fa-chart-pie"></i> Panel de Administración</h1>
+    <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nuevo Producto
+    </a>
+</div>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card stat-card stat-card-blue h-100">
+            <div class="card-body py-4 d-flex align-items-center gap-4">
+                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-primary-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-box-open fa-lg" style="color:var(--accent-primary);"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Productos</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_productos }}</h2>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'catalogo:dashboard' %}" class="btn btn-sm btn-outline-primary">Ver catálogo</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card stat-card-green h-100">
+            <div class="card-body py-4 d-flex align-items-center gap-4">
+                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-success-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-users fa-lg" style="color:var(--accent-success);"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Clientes</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_usuarios }}</h2>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'administradores:listar_usuarios' %}" class="btn btn-sm btn-outline-success">Ver usuarios</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card stat-card-amber h-100">
+            <div class="card-body py-4 d-flex align-items-center gap-4">
+                <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-warning-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-tags fa-lg" style="color:var(--accent-warning);"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;">Categorías</p>
+                    <h2 class="mb-0 fw-bold" style="font-size:2rem;">{{ total_categorias }}</h2>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'catalogo:dashboard' %}" class="btn btn-sm btn-outline-secondary">Ver catálogo</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Productos recientes -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-clock"></i> Productos Recientes</h5>
+        <a href="{% url 'administradores:crear_producto' %}" class="btn btn-sm btn-success">
+            <i class="fas fa-plus"></i> Agregar
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos_recientes %}
+                    <tr>
+                        <td>
+                            <strong>{{ producto.nombre }}</strong>
+                            <small class="d-block text-muted">{{ producto.marca }} · {{ producto.gramaje }}</small>
+                        </td>
+                        <td>{{ producto.categoria.icono_emoji }} {{ producto.categoria.nombre }}</td>
+                        <td>${{ producto.precio }}</td>
+                        <td>
+                            {% if producto.stock > 10 %}
+                                <span class="badge bg-success">{{ producto.stock }} paq.</span>
+                            {% elif producto.stock > 0 %}
+                                <span class="badge bg-warning text-dark">{{ producto.stock }} paq.</span>
+                            {% else %}
+                                <span class="badge bg-danger">Agotado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'administradores:editar_producto' producto.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'administradores:eliminar_producto' producto.id %}" class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar el producto &quot;{{ producto.nombre }}&quot;?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No hay productos aún.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

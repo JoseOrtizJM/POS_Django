@@ -276,6 +276,7 @@
                 <th><i class="fas fa-box"></i> Paquete</th>
                 <th><i class="fas fa-money-bill"></i> Precio</th>
                 <th><i class="fas fa-warehouse"></i> Stock</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -330,6 +331,28 @@
                     <span class="stock-badge stock-agotado">
                         <i class="fas fa-times-circle"></i> Agotado
                     </span>
+                    {% endif %}
+                </td>
+
+                <!-- Agregar al carrito -->
+                <td>
+                    {% if esta_autenticado and not es_admin %}
+                        {% if producto.stock > 0 %}
+                        <form method="post" action="{% url 'usuarios:agregar_al_carrito' producto.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm" title="Agregar al carrito">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-outline-secondary btn-sm" disabled title="Sin stock">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        {% endif %}
+                    {% elif not esta_autenticado %}
+                        <a href="{% url 'usuarios:login' %}" class="btn btn-outline-primary btn-sm" title="Inicia sesión para comprar">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </a>
                     {% endif %}
                 </td>
             </tr>

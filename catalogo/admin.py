@@ -1,19 +1,5 @@
 from django.contrib import admin
-from .models import Categoria, Producto, UsuarioPOS
-
-@admin.register(UsuarioPOS)
-class UsuarioPOSAdmin(admin.ModelAdmin):
-    list_display = ('user', 'rol', 'correo_validado', 'creado_en')
-    list_filter = ('rol', 'correo_validado', 'creado_en')
-    search_fields = ('user__email', 'user__username')
-    readonly_fields = ('creado_en',)
-
-
-@admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'icono_emoji', 'creado_en')
-    search_fields = ('nombre',)
-    list_filter = ('creado_en',)
+from .models import Producto
 
 
 @admin.register(Producto)
@@ -46,3 +32,4 @@ class ProductoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+

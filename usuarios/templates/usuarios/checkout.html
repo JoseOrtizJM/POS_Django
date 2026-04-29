@@ -1,0 +1,173 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Pedido - POS{% endblock %}
+
+{% block content %}
+<div class="my-4">
+    <h1><i class="fas fa-lock" style="color:var(--accent-success);"></i> Confirmar Pedido</h1>
+</div>
+
+<form method="post" id="form-checkout">
+    {% csrf_token %}
+    <div class="row g-4">
+
+        <!-- Resumen de productos -->
+        <div class="col-lg-7">
+            <div class="card mb-4">
+                <div class="card-header"><i class="fas fa-box"></i> Productos del pedido</div>
+                <div class="card-body p-0">
+                    {% for item in items %}
+                    <div class="d-flex align-items-center gap-3 p-3"
+                         style="border-bottom:1px solid var(--border);{% if forloop.last %}border-bottom:none;{% endif %}">
+                        <div class="flex-grow-1">
+                            <div style="font-weight:600; color:var(--text-primary); font-size:.9rem;">{{ item.producto.nombre }}</div>
+                            <small style="color:var(--text-secondary);">{{ item.producto.marca }} · {{ item.producto.gramaje }}</small>
+                        </div>
+                        <div style="color:var(--text-secondary); font-size:.9rem;">×{{ item.cantidad }}</div>
+                        <div style="font-weight:700; color:var(--text-primary); min-width:70px; text-align:right;">${{ item.subtotal }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Método de pago -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-credit-card"></i> Forma de Pago</div>
+                <div class="card-body">
+
+                    <!-- Opción: Efectivo -->
+                    <div class="mb-3">
+                        <div class="form-check" style="padding:.9rem 1rem; border:1px solid var(--border); border-radius:10px; cursor:pointer;"
+                             onclick="seleccionarPago('efectivo')">
+                            <input class="form-check-input" type="radio" name="metodo_pago" id="pago_efectivo"
+                                   value="efectivo" {% if not tarjetas %}checked{% endif %}>
+                            <label class="form-check-label d-flex align-items-center gap-2" for="pago_efectivo" style="cursor:pointer;">
+                                <i class="fas fa-money-bill-wave fa-lg" style="color:var(--accent-success);"></i>
+                                <div>
+                                    <div style="font-weight:600; color:var(--text-primary);">Efectivo</div>
+                                    <small style="color:var(--text-secondary);">Pagas al momento de la entrega</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Opción: Tarjeta -->
+                    <div>
+                        <div class="form-check" style="padding:.9rem 1rem; border:1px solid var(--border); border-radius:10px; cursor:pointer;"
+                             onclick="seleccionarPago('tarjeta')">
+                            <input class="form-check-input" type="radio" name="metodo_pago" id="pago_tarjeta"
+                                   value="tarjeta" {% if tarjetas %}checked{% endif %}>
+                            <label class="form-check-label d-flex align-items-center gap-2" for="pago_tarjeta" style="cursor:pointer;">
+                                <i class="fas fa-credit-card fa-lg" style="color:var(--accent-primary);"></i>
+                                <div>
+                                    <div style="font-weight:600; color:var(--text-primary);">Tarjeta de crédito / débito</div>
+                                    <small style="color:var(--text-secondary);">Usa una tarjeta guardada o agrega una nueva</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Selector de tarjetas -->
+                        <div id="seccion-tarjetas" style="margin-top:.75rem; padding-left:1rem; {% if not tarjetas %}display:none;{% endif %}">
+                            {% if tarjetas %}
+                                <p style="color:var(--text-secondary); font-size:.85rem; margin-bottom:.75rem;">Selecciona una tarjeta:</p>
+                                {% for tarjeta in tarjetas %}
+                                <label class="d-flex align-items-center gap-3 p-3 mb-2"
+                                       style="border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:border-color .2s;"
+                                       onmouseover="this.style.borderColor='var(--border-focus)'"
+                                       onmouseout="this.style.borderColor='var(--border)'">
+                                    <input type="radio" name="tarjeta_id" value="{{ tarjeta.id }}"
+                                           {% if tarjeta.es_predeterminada %}checked{% endif %}
+                                           style="accent-color:var(--accent-primary);">
+                                    <div class="card-visual {{ tarjeta.tipo_tarjeta }}" style="width:110px; min-height:68px; padding:.7rem .9rem; font-size:.78rem;">
+                                        <div style="font-size:.95rem; letter-spacing:.18em; color:rgba(255,255,255,.8);">****{{ tarjeta.ultimos_cuatro }}</div>
+                                        <div style="font-size:.7rem; color:rgba(255,255,255,.6);">{{ tarjeta.mes_expiracion }}/{{ tarjeta.anio_expiracion }}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:var(--text-primary); font-size:.9rem;">
+                                            {{ tarjeta.get_tipo_tarjeta_display }} ****{{ tarjeta.ultimos_cuatro }}
+                                        </div>
+                                        <small style="color:var(--text-secondary);">{{ tarjeta.nombre_titular }}</small>
+                                        {% if tarjeta.es_predeterminada %}
+                                            <span class="badge" style="background:var(--accent-primary-glow); color:var(--accent-primary-light); font-size:.72rem; margin-left:.4rem;">Predeterminada</span>
+                                        {% endif %}
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-info" style="font-size:.875rem;">
+                                    <i class="fas fa-info-circle"></i> No tienes tarjetas guardadas.
+                                </div>
+                            {% endif %}
+
+                            <a href="{% url 'usuarios:agregar_tarjeta' %}?next=checkout"
+                               class="btn btn-outline-primary btn-sm mt-1">
+                                <i class="fas fa-plus"></i> Agregar nueva tarjeta
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral — total y confirmar -->
+        <div class="col-lg-5">
+            <div class="card" style="position:sticky; top:80px;">
+                <div class="card-header"><i class="fas fa-receipt"></i> Total del Pedido</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2" style="color:var(--text-secondary); font-size:.9rem;">
+                        <span>Subtotal</span>
+                        <span>${{ carrito.total }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2" style="color:var(--text-secondary); font-size:.9rem;">
+                        <span>Envío</span>
+                        <span style="color:var(--accent-success);">A coordinar</span>
+                    </div>
+                    <hr style="border-color:var(--border);">
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong>Total</strong>
+                        <strong style="font-size:1.3rem; color:var(--accent-success);">${{ carrito.total }}</strong>
+                    </div>
+
+                    <div style="background:var(--bg-elevated); border-radius:8px; padding:.75rem 1rem; margin-bottom:1rem; font-size:.85rem; color:var(--text-secondary);">
+                        <i class="fas fa-truck" style="color:var(--accent-warning);"></i>
+                        Entrega a: <strong style="color:var(--text-primary);">{{ usuario_actual.direccion }}, {{ usuario_actual.ciudad }}</strong>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-lg">
+                        <i class="fas fa-check-circle"></i> Confirmar Pedido
+                    </button>
+                    <a href="{% url 'usuarios:carrito' %}" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="fas fa-arrow-left"></i> Volver al carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function seleccionarPago(tipo) {
+    document.getElementById('pago_' + tipo).checked = true;
+    const sec = document.getElementById('seccion-tarjetas');
+    if (tipo === 'tarjeta') {
+        sec.style.display = 'block';
+    } else {
+        sec.style.display = 'none';
+    }
+}
+// Sincronizar al cargar
+document.addEventListener('DOMContentLoaded', function () {
+    const checked = document.querySelector('input[name="metodo_pago"]:checked');
+    if (checked) seleccionarPago(checked.value);
+    // Escuchar cambios
+    document.querySelectorAll('input[name="metodo_pago"]').forEach(function(el) {
+        el.addEventListener('change', function() { seleccionarPago(this.value); });
+    });
+});
+</script>
+{% endblock %}

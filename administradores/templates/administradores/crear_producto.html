@@ -1,0 +1,90 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Nuevo Producto - POS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-8">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0"><i class="fas fa-plus-circle"></i> Nuevo Producto</h2>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Nombre del producto" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Marca *</label>
+                            <input type="text" name="marca" class="form-control" placeholder="Marca" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Gramaje / Volumen *</label>
+                            <input type="text" name="gramaje" class="form-control" placeholder="Ej: 600ml, 1kg" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Categoría *</label>
+                            <select name="categoria" class="form-select" required>
+                                <option value="">-- Selecciona --</option>
+                                {% for cat in categorias %}
+                                    <option value="{{ cat.id }}">{{ cat.icono_emoji }} {{ cat.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipo de Paquete *</label>
+                            <select name="tipo_paquete" class="form-select" required>
+                                <option value="Paquete">Paquete</option>
+                                <option value="Caja">Caja</option>
+                                <option value="Bulto">Bulto</option>
+                                <option value="Costal">Costal</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Piezas por Paquete *</label>
+                            <input type="number" name="piezas_por_paquete" class="form-control" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio (MXN) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="precio" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Stock (paquetes)</label>
+                            <input type="number" name="stock" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" placeholder="Descripción opcional..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Imagen del Producto</label>
+                            <input type="file" name="imagen" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Guardar Producto
+                        </button>
+                        <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

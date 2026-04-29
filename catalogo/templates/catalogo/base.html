@@ -5,82 +5,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}POS - Punto de Venta{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Estilos personalizados -->
     <link rel="stylesheet" href="{% static 'catalogo/css/style.css' %}">
-    
+
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'catalogo:dashboard' %}">
-                <i class="fas fa-shopping-cart"></i> POS - Mayoreo
+                <i class="fas fa-shopping-cart"></i> POS Mayoreo
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if esta_autenticado %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'catalogo:dashboard' %}">
                                 <i class="fas fa-home"></i> Inicio
                             </a>
                         </li>
-                        
-                        {% if user.pos_usuario.es_admin %}
+
+                        {% if es_admin %}
+                            <!-- Menú de administración -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-cog"></i> Administración
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" style="background-color: var(--dark-secondary); border-color: var(--dark-border);">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'catalogo:admin_panel' %}" style="color: var(--text-primary);">
+                                        <a class="dropdown-item" href="{% url 'administradores:panel' %}">
                                             <i class="fas fa-chart-pie"></i> Panel Admin
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'catalogo:crear_producto' %}" style="color: var(--text-primary);">
+                                        <a class="dropdown-item" href="{% url 'administradores:crear_producto' %}">
                                             <i class="fas fa-plus"></i> Nuevo Producto
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'catalogo:listar_usuarios' %}" style="color: var(--text-primary);">
+                                        <a class="dropdown-item" href="{% url 'administradores:listar_usuarios' %}">
                                             <i class="fas fa-users"></i> Usuarios
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider" style="border-color: var(--dark-border);"></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:logout' %}">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link" style="cursor:default; color:var(--accent-warning) !important;">
+                                    <i class="fas fa-user-shield"></i> {{ admin_actual.nombre_usuario }}
+                                </span>
+                            </li>
+
+                        {% else %}
+                            <!-- Carrito (solo para usuarios) -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-carrito" href="{% url 'usuarios:carrito' %}" title="Mi carrito">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    {% if items_en_carrito > 0 %}
+                                        <span class="carrito-badge">{{ items_en_carrito }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+
+                            <!-- Menú de usuario -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ usuario_actual.get_nombre_corto }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:carrito' %}">
+                                            <i class="fas fa-shopping-cart"></i> Mi carrito
+                                            {% if items_en_carrito > 0 %}
+                                                <span class="badge" style="background:var(--accent-danger); color:#fff; margin-left:.3rem;">{{ items_en_carrito }}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:mis_tarjetas' %}">
+                                            <i class="fas fa-credit-card"></i> Mis tarjetas
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:logout' %}">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         {% endif %}
-                        
-                        <li class="nav-item">
-                            <span class="nav-link" style="cursor: default;">
-                                <i class="fas fa-user-circle"></i> {{ user.email }}
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'catalogo:logout' %}">
-                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                            </a>
-                        </li>
+
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'catalogo:login' %}">
+                            <a class="nav-link" href="{% url 'usuarios:login' %}">
                                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'catalogo:registro' %}">
+                            <a class="nav-link" href="{% url 'usuarios:registro' %}">
                                 <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'administradores:login' %}"
+                               style="color:var(--accent-warning) !important; opacity:.8;">
+                                <i class="fas fa-user-shield"></i> Admin
                             </a>
                         </li>
                     {% endif %}
@@ -89,11 +130,10 @@
         </div>
     </nav>
 
-    <!-- Mensajes -->
     {% if messages %}
-        <div class="container-fluid">
+        <div class="container-fluid px-4 pt-3">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show m-3" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -101,26 +141,20 @@
         </div>
     {% endif %}
 
-    <!-- Contenido principal -->
     <main>
         <div class="container">
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="mt-5">
         <div class="container">
-            <p class="mb-0">&copy; 2026 POS - Sistema de Punto de Venta Mayoreo. Todos los derechos reservados.</p>
+            <p class="mb-0">&copy; 2026 POS — Sistema de Punto de Venta Mayoreo.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Scripts personalizados -->
     <script src="{% static 'catalogo/js/main.js' %}"></script>
-    
     {% block extra_js %}{% endblock %}
 </body>
 </html>
