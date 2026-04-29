@@ -58,7 +58,6 @@ class Command(BaseCommand):
                 'estado_provincia': 'CDMX',
                 'codigo_postal': '03940',
                 'pais': 'MX',
-                'metodo_pago_preferido': 'tarjeta',
             },
             {
                 'email': 'carlos.mendez@hotmail.com',
@@ -71,7 +70,6 @@ class Command(BaseCommand):
                 'estado_provincia': 'Jalisco',
                 'codigo_postal': '44100',
                 'pais': 'MX',
-                'metodo_pago_preferido': 'efectivo',
             },
         ]
 
@@ -90,7 +88,6 @@ class Command(BaseCommand):
                 estado_provincia=data['estado_provincia'],
                 codigo_postal=data['codigo_postal'],
                 pais=data['pais'],
-                metodo_pago_preferido=data['metodo_pago_preferido'],
                 activo=True,
             )
             usuario.set_password(data['password'])
