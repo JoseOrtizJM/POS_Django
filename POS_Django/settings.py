@@ -42,7 +42,22 @@ INSTALLED_APPS = [
     'administradores',
     'categorias',
     'ventas',
+    'rest_framework',
+    'api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'api.authentication.TokenAPIAuthentication',
+        'api.authentication.AdminTokenAPIAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
