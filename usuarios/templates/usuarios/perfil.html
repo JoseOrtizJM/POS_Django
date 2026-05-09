@@ -1,0 +1,133 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil - POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1><i class="fas fa-user-edit" style="color:var(--accent-primary);"></i> Mi Perfil</h1>
+</div>
+
+<div class="row g-4">
+
+    <!-- Información de sólo lectura -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center py-4">
+                <div style="width:90px; height:90px; border-radius:50%; background:var(--accent-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                    <i class="fas fa-user fa-2x" style="color:#fff;"></i>
+                </div>
+                <h4 style="color:var(--text-primary);">{{ usuario.nombre_completo }}</h4>
+                <p style="color:var(--text-muted); margin-bottom:.25rem;">@{{ usuario.nombre_usuario }}</p>
+                <p style="color:var(--text-muted); font-size:.85rem;">
+                    <i class="fas fa-calendar-alt"></i>
+                    Miembro desde {{ usuario.creado_en|date:"d/m/Y" }}
+                </p>
+            </div>
+            <div class="card-footer">
+                <p class="mb-1" style="color:var(--text-muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.05em;">
+                    <i class="fas fa-lock"></i> No modificable
+                </p>
+                <p class="mb-0" style="color:var(--text-secondary);">
+                    <strong>Usuario:</strong> {{ usuario.nombre_usuario }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4" style="color:var(--text-primary);">
+                    <i class="fas fa-edit"></i> Editar información
+                </h5>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{{ form.nombre_completo.label }}</label>
+                            {{ form.nombre_completo }}
+                            {% if form.nombre_completo.errors %}
+                                <div class="text-danger small mt-1">{{ form.nombre_completo.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.telefono.label }}</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                                <div class="text-danger small mt-1">{{ form.telefono.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">{{ form.direccion.label }}</label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="text-danger small mt-1">{{ form.direccion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.ciudad.label }}</label>
+                            {{ form.ciudad }}
+                            {% if form.ciudad.errors %}
+                                <div class="text-danger small mt-1">{{ form.ciudad.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.estado_provincia.label }}</label>
+                            {{ form.estado_provincia }}
+                            {% if form.estado_provincia.errors %}
+                                <div class="text-danger small mt-1">{{ form.estado_provincia.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.codigo_postal.label }}</label>
+                            {{ form.codigo_postal }}
+                            {% if form.codigo_postal.errors %}
+                                <div class="text-danger small mt-1">{{ form.codigo_postal.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label">{{ form.pais.label }}</label>
+                            {{ form.pais }}
+                            {% if form.pais.errors %}
+                                <div class="text-danger small mt-1">{{ form.pais.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
+                        <a href="{% url 'catalogo:dashboard' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

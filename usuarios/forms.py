@@ -126,6 +126,68 @@ class LoginForm(forms.Form):
     )
 
 
+class PerfilForm(forms.Form):
+    nombre_completo = forms.CharField(
+        label='Nombre Completo',
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        label='Correo Electrónico',
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    telefono = forms.CharField(
+        label='Teléfono',
+        max_length=20,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '5512345678'})
+    )
+    direccion = forms.CharField(
+        label='Dirección',
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    ciudad = forms.CharField(
+        label='Ciudad',
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    estado_provincia = forms.CharField(
+        label='Estado / Provincia',
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    codigo_postal = forms.CharField(
+        label='Código Postal',
+        max_length=20,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    pais = forms.ChoiceField(
+        label='País',
+        choices=Usuario.PAISES,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    def __init__(self, *args, usuario=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._usuario = usuario
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].lower().strip()
+        qs = Usuario.objects.filter(email=email)
+        if self._usuario:
+            qs = qs.exclude(pk=self._usuario.pk)
+        if qs.exists():
+            raise ValidationError('Este correo ya está en uso por otra cuenta.')
+        return email
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data['telefono'].strip()
+        limpio = telefono.replace(' ', '').replace('-', '')
+        if not re.match(r'^\+?1?\d{9,15}$', limpio):
+            raise ValidationError('Número de teléfono inválido (ej: 5512345678).')
+        return telefono
+
+
 class TarjetaForm(forms.Form):
     MESES = [(str(i).zfill(2), str(i).zfill(2)) for i in range(1, 13)]
     anio_actual = date.today().year

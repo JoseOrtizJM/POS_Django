@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from functools import wraps
 from .models import Usuario, TarjetaCredito, Carrito, CarritoItem
-from .forms import LoginForm, RegistroForm, TarjetaForm
+from .forms import LoginForm, RegistroForm, TarjetaForm, PerfilForm
+from api.email import enviar_bienvenida, enviar_confirmacion_pedido
 
 
 # ==================== DECORADORES ====================
@@ -93,6 +94,7 @@ def registro_view(request):
 
             request.session['usuario_id'] = usuario.id
             request.session['tipo_sesion'] = 'usuario'
+            enviar_bienvenida(usuario)
             messages.success(request, f'¡Cuenta creada! Bienvenido, {usuario.get_nombre_corto()}.')
             return redirect('catalogo:dashboard')
     else:
@@ -261,6 +263,7 @@ def checkout(request):
             prod.save()
 
         carrito.items.all().delete()
+        enviar_confirmacion_pedido(usuario, venta)
 
         messages.success(
             request,
@@ -274,6 +277,46 @@ def checkout(request):
         'items': items,
         'tarjetas': tarjetas,
         'titulo': 'Confirmar Pedido',
+    })
+
+
+# ==================== PERFIL ====================
+
+@solo_usuario
+def mi_perfil(request):
+    usuario = _get_usuario(request)
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, usuario=usuario)
+        if form.is_valid():
+            d = form.cleaned_data
+            usuario.nombre_completo = d['nombre_completo']
+            usuario.email = d['email']
+            usuario.telefono = d['telefono']
+            usuario.direccion = d['direccion']
+            usuario.ciudad = d['ciudad']
+            usuario.estado_provincia = d['estado_provincia']
+            usuario.codigo_postal = d['codigo_postal']
+            usuario.pais = d['pais']
+            usuario.save()
+            messages.success(request, 'Tus datos fueron actualizados correctamente.')
+            return redirect('usuarios:perfil')
+    else:
+        form = PerfilForm(initial={
+            'nombre_completo': usuario.nombre_completo,
+            'email': usuario.email,
+            'telefono': usuario.telefono,
+            'direccion': usuario.direccion,
+            'ciudad': usuario.ciudad,
+            'estado_provincia': usuario.estado_provincia,
+            'codigo_postal': usuario.codigo_postal,
+            'pais': usuario.pais,
+        }, usuario=usuario)
+
+    return render(request, 'usuarios/perfil.html', {
+        'form': form,
+        'usuario': usuario,
+        'titulo': 'Mi Perfil',
     })
 
 

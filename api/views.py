@@ -13,6 +13,7 @@ from administradores.models import Administrador
 from .models import TokenAPI, TokenAPIAdmin
 from .authentication import TokenAPIAuthentication, AdminTokenAPIAuthentication
 from .permissions import IsUsuarioAuthenticated, IsAdminAuthenticated
+from .email import enviar_bienvenida, enviar_confirmacion_pedido
 from .serializers import (
     CategoriaSerializer, ProductoSerializer,
     CarritoSerializer, CarritoItemSerializer,
@@ -169,6 +170,7 @@ def registro_usuario(request):
     usuario.save()
 
     token = TokenAPI.objects.create(usuario=usuario)
+    enviar_bienvenida(usuario)
     return Response(
         {
             'token': token.key,
@@ -405,6 +407,7 @@ def checkout(request):
         prod.save()
 
     carrito.items.all().delete()
+    enviar_confirmacion_pedido(usuario, venta)
 
     return Response(
         {'mensaje': 'Pedido confirmado.', 'venta': VentaSerializer(venta).data},

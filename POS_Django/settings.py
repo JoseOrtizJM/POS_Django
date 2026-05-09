@@ -145,3 +145,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Media files
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ── Email (Gmail SMTP) ────────────────────────────────────────────
+# Genera una contraseña de aplicación en:
+# myaccount.google.com → Seguridad → Contraseñas de aplicaciones
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'juliortizmartinez623@gmail.com'
+EMAIL_HOST_PASSWORD = 'aeyh lwnc hkke iies'  # Contraseña de aplicación de Google
+DEFAULT_FROM_EMAIL = 'Mayorista <juliortizmartinez623@gmail.com>'
+EMAIL_NOTIFICACIONES_ENABLED = True  # Ponlo en True cuando configures el correo

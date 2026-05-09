@@ -9,6 +9,9 @@ urlpatterns = [
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),
 
+    # Perfil
+    path('perfil/', views.mi_perfil, name='perfil'),
+
     # AJAX
     path('verificar-email/', views.verificar_email, name='verificar_email'),
     path('verificar-usuario/', views.verificar_nombre_usuario, name='verificar_nombre_usuario'),
