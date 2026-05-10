@@ -3,6 +3,10 @@
 
 {% block title %}Mis Tarjetas - POS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/pages/carrito.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center my-4">
     <h1><i class="fas fa-credit-card" style="color:var(--accent-primary);"></i> Mis Tarjetas</h1>

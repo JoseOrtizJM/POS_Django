@@ -1,0 +1,51 @@
+/* ==================== VARIABLES DE TEMA ==================== */
+:root {
+    /* Fondos — carbón cálido en capas */
+    --bg-base:      #222120;
+    --bg-surface:   #2c2a27;
+    --bg-elevated:  #353230;
+    --bg-hover:     #413e39;
+    --bg-input:     #272523;
+
+    /* Bordes */
+    --border:       #4a4540;
+    --border-light: #5c5750;
+    --border-focus: #8a6a50;
+
+    /* Texto — crema cálida con jerarquía */
+    --text-primary:   #ede8e0;
+    --text-label:     #ddd5c8;
+    --text-secondary: #9c9080;
+    --text-muted:     #685e52;
+
+    /* Acento principal — burdeos/vino */
+    --accent-primary:       #8c3a42;
+    --accent-primary-dark:  #6e2c33;
+    --accent-primary-light: #bf7a82;
+    --accent-primary-glow:  rgba(140, 58, 66, 0.2);
+
+    /* Éxito — gris-verde salvia */
+    --accent-success:       #7a9088;
+    --accent-success-dark:  #5e7870;
+    --accent-success-glow:  rgba(122, 144, 136, 0.18);
+
+    /* Peligro — burdeos más brillante */
+    --accent-danger:        #c05060;
+    --accent-danger-dark:   #9a3848;
+    --accent-danger-glow:   rgba(192, 80, 96, 0.18);
+
+    /* Advertencia — taupe cálido */
+    --accent-warning:       #b08a5e;
+    --accent-warning-dark:  #8e6a40;
+    --accent-warning-glow:  rgba(176, 138, 94, 0.18);
+
+    /* Aliases de compatibilidad */
+    --dark-bg:        var(--bg-base);
+    --dark-secondary: var(--bg-elevated);
+    --dark-tertiary:  var(--bg-surface);
+    --dark-border:    var(--border);
+    --accent-blue:    #5c6b6d;
+    --accent-green:   var(--accent-success);
+    --accent-red:     var(--accent-danger);
+    --accent-yellow:  var(--accent-warning);
+}

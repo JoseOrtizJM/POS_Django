@@ -1,243 +1,10 @@
 {% extends "catalogo/base.html" %}
+{% load static %}
 
 {% block title %}{{ categoria.nombre }} - Productos{% endblock %}
 
 {% block extra_css %}
-<style>
-    .categoria-header {
-        background-color: #25386b;
-        color: var(--text-primary);
-        padding: 2.5rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        text-align: center;
-        border: 1px solid var(--dark-border);
-    }
-
-    .categoria-header-emoji {
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .categoria-header-title {
-        font-size: 2.2rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.5px;
-    }
-
-    .categoria-header-count {
-        font-size: 1rem;
-        color: rgb(224, 224, 224);
-    }
-
-    .tabla-productos {
-        background-color: #d9d9d9 !important;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--dark-border);
-    }
-
-    .table-header {
-        border: none;
-        padding: 1.25rem 1rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        color: #111111 !important;
-        background-color: #b0b0b0 !important;
-    }
-
-    .table thead {
-        background-color: #b0b0b0 !important;
-    }
-
-    .table thead tr {
-        background-color: #b0b0b0 !important;
-    }
-
-    .table thead tr th {
-        background-color: #b0b0b0 !important;
-        color: #111111 !important;
-    }
-
-    .table-header th {
-        border: none;
-        padding: 1.25rem 1rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        color: var(--text-secondary);
-    }
-
-    .table {
-        background-color: #e8e8e8;
-        color: #111111;
-        margin-bottom: 0;
-    }
-
-    .table tbody tr {
-        transition: background-color 0.2s ease;
-        border-bottom: 1px solid var(--dark-border);
-    }
-
-    .table tbody tr:hover {
-        background-color: rgba(59, 130, 246, 0.15);
-    }
-
-    .table tbody td {
-        background-color: #d9d9d9 !important;
-        padding: 1.1rem 1rem;
-        vertical-align: middle;
-        border: none;
-    }
-
-    .table tbody tr:nth-child(even) td {
-        background-color: #d9d9d9 !important;
-    }
-
-
-    .table tbody tr:hover td {
-        background-color: #cccccc !important;
-    }
-
-    .producto-nombre {
-        font-weight: 600;
-        color: #111111 !important;
-        font-size: 0.95rem;
-    }
-
-    .producto-marca {
-        color: #333333 !important;
-        font-size: 0.85rem;
-        margin-top: 0.3rem;
-    }
-
-    .producto-gramaje {
-        background-color: rgba(59, 130, 246, 0.1);
-        padding: 0.3rem 0.8rem;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        color: var(--accent-blue);
-        display: inline-block;
-        margin: 0.2rem;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .precio-paquete {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--accent-green);
-    }
-
-    .stock-badge {
-        display: inline-block;
-        padding: 0.4rem 0.9rem;
-        border-radius: 20px;
-        font-weight: 500;
-        font-size: 0.85rem;
-        border: 1px solid currentColor;
-    }
-
-    .stock-alto {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--accent-green);
-        border-color: rgba(16, 185, 129, 0.3);
-    }
-
-    .stock-medio {
-        background-color: rgba(245, 158, 11, 0.1);
-        color: var(--accent-yellow);
-        border-color: rgba(245, 158, 11, 0.3);
-    }
-
-    .stock-bajo {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--accent-red);
-        border-color: rgba(239, 68, 68, 0.3);
-    }
-
-    .stock-agotado {
-        background-color: rgba(107, 114, 128, 0.1);
-        color: var(--text-secondary);
-        border-color: rgba(107, 114, 128, 0.3);
-    }
-
-    .paquete-info {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .tipo-paquete-badge {
-        background-color: rgba(59, 130, 246, 0.1);
-        color: var(--accent-blue);
-        padding: 0.2rem 0.6rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .piezas-badge {
-        background-color: rgba(245, 158, 11, 0.1);
-        color: var(--accent-yellow);
-        padding: 0.2rem 0.6rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        border: 1px solid rgba(245, 158, 11, 0.2);
-    }
-
-    .sin-productos {
-        text-align: center;
-        padding: 3rem 2rem;
-        background-color: var(--dark-tertiary);
-        border-radius: 12px;
-        color: var(--text-secondary);
-        border: 1px solid var(--dark-border);
-    }
-
-    .sin-productos i {
-        font-size: 2.5rem;
-        color: var(--text-secondary);
-        opacity: 0.5;
-        margin-bottom: 1rem;
-    }
-
-    .sin-productos h4 {
-        color: var(--text-primary);
-    }
-
-    .sin-productos a {
-        color: var(--accent-blue);
-    }
-
-    .breadcrumb-custom {
-        background-color: transparent;
-        padding: 0;
-        margin-bottom: 2rem;
-    }
-
-    .breadcrumb-custom a {
-        color: var(--accent-blue);
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .breadcrumb-custom a:hover {
-        color: var(--text-primary);
-    }
-
-    /* Bootstrap table dark mode */
-    .table-hover tbody tr:hover {
-        background-color: rgba(59, 130, 246, 0.05);
-    }
-</style>
+<link rel="stylesheet" href="{% static 'catalogo/css/pages/catalogo.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -245,126 +12,209 @@
 <nav aria-label="breadcrumb" class="breadcrumb-custom">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{% url 'catalogo:dashboard' %}">
-                <i class="fas fa-home"></i> Inicio
-            </a>
+            <a href="{% url 'catalogo:dashboard' %}"><i class="fas fa-home"></i> Inicio</a>
         </li>
         <li class="breadcrumb-item active">{{ categoria.nombre }}</li>
     </ol>
 </nav>
 
-<!-- Header de Categoría -->
+<!-- Header de categoría -->
 <div class="categoria-header">
     <div class="categoria-header-emoji">{{ categoria.icono_emoji }}</div>
     <h1 class="categoria-header-title">{{ categoria.nombre }}</h1>
-    {% if categoria.descripcion %}
-    <p style="margin-bottom: 0.5rem;">{{ categoria.descripcion }}</p>
-    {% endif %}
+    {% if categoria.descripcion %}<p style="margin-bottom:.3rem;">{{ categoria.descripcion }}</p>{% endif %}
     <div class="categoria-header-count">
-        <i class="fas fa-box"></i> {{ productos.count }} productos disponibles
+        <i class="fas fa-box"></i> {{ productos|length }} producto{{ productos|length|pluralize:"s" }} disponible{{ productos|length|pluralize:"s" }}
     </div>
 </div>
 
-<!-- Tabla de Productos -->
-{% if productos %}
-<div class="tabla-productos">
-    <table class="table table-hover mb-0">
-        <thead class="table-header">
-            <tr>
-                <th><i class="fas fa-tag"></i> Producto</th>
-                <th><i class="fas fa-cube"></i> Presentación</th>
-                <th><i class="fas fa-box"></i> Paquete</th>
-                <th><i class="fas fa-money-bill"></i> Precio</th>
-                <th><i class="fas fa-warehouse"></i> Stock</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <!-- Nombre y Marca -->
-                <td>
-                    <div class="producto-nombre">{{ producto.nombre }}</div>
-                    <div class="producto-marca">
-                        <i class="fas fa-industry"></i> {{ producto.marca }}
-                    </div>
-                </td>
-
-                <!-- Presentación -->
-                <td>
-                    <span class="producto-gramaje">
-                        <i class="fas fa-vial"></i> {{ producto.gramaje }}
-                    </span>
-                </td>
-
-                <!-- Información del Paquete -->
-                <td>
-                    <div class="paquete-info">
-                        <span class="tipo-paquete-badge">{{ producto.tipo_paquete }}</span>
-                        <span class="piezas-badge">
-                            <i class="fas fa-cubes"></i> {{ producto.piezas_por_paquete }} pzs
-                        </span>
-                    </div>
-                </td>
-
-                <!-- Precio -->
-                <td>
-                    <span class="precio-paquete">${{ producto.precio|floatformat:2 }}</span>
-                    <div style="font-size: 0.85rem; color: #7f8c8d;">por paquete</div>
-                </td>
-
-                <!-- Stock -->
-                <td>
-                    {% if producto.stock > 20 %}
-                    <span class="stock-badge stock-alto">
-                        <i class="fas fa-check-circle"></i> {{ producto.stock }} paq.
-                    </span>
-                    {% elif producto.stock > 10 %}
-                    <span class="stock-badge stock-medio">
-                        <i class="fas fa-exclamation-triangle"></i> {{ producto.stock }} paq.
-                    </span>
-                    {% elif producto.stock > 0 %}
-                    <span class="stock-badge stock-bajo">
-                        <i class="fas fa-exclamation-circle"></i> {{ producto.stock }} paq.
-                    </span>
-                    {% else %}
-                    <span class="stock-badge stock-agotado">
-                        <i class="fas fa-times-circle"></i> Agotado
-                    </span>
-                    {% endif %}
-                </td>
-
-                <!-- Agregar al carrito -->
-                <td>
-                    {% if esta_autenticado and not es_admin %}
-                        {% if producto.stock > 0 %}
-                        <form method="post" action="{% url 'usuarios:agregar_al_carrito' producto.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary btn-sm" title="Agregar al carrito">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                        </form>
-                        {% else %}
-                        <button class="btn btn-outline-secondary btn-sm" disabled title="Sin stock">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                        {% endif %}
-                    {% elif not esta_autenticado %}
-                        <a href="{% url 'usuarios:login' %}" class="btn btn-outline-primary btn-sm" title="Inicia sesión para comprar">
-                            <i class="fas fa-sign-in-alt"></i>
-                        </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Buscador -->
+<div class="buscador-wrapper">
+    <i class="fas fa-search buscador-icon"></i>
+    <input type="text" id="buscador-categoria" class="buscador-input"
+           placeholder="Buscar por nombre o marca...">
 </div>
+
+<!-- Mensaje sin resultados de búsqueda -->
+<div id="buscador-sin-resultados" class="sin-productos" style="display:none;">
+    <i class="fas fa-search"></i>
+    <h4>Sin resultados</h4>
+    <p>Ningún producto coincide con tu búsqueda en esta categoría.</p>
+</div>
+
+<!-- Grid de productos -->
+{% if productos %}
+<div class="productos-grid" id="productos-grid">
+    {% for producto in productos %}
+    <div class="producto-card">
+
+        <!-- Imagen -->
+        <div class="producto-card-img-wrap">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-card-img">
+            {% else %}
+                <div class="producto-card-img-placeholder">
+                    <i class="fas fa-box"></i>
+                </div>
+            {% endif %}
+
+            {% if producto.stock == 0 %}
+                <span class="stock-overlay">Agotado</span>
+            {% elif producto.stock <= 10 %}
+                <span class="stock-overlay stock-overlay-warn">Poco stock</span>
+            {% endif %}
+        </div>
+
+        <!-- Cuerpo -->
+        <div class="producto-card-body">
+            <div class="producto-card-nombre">{{ producto.nombre }}</div>
+            <div class="producto-card-meta">{{ producto.marca }} &middot; {{ producto.gramaje }}</div>
+            <div class="producto-card-badges">
+                <span class="badge-paquete">{{ producto.tipo_paquete }}</span>
+                <span class="badge-piezas"><i class="fas fa-cubes"></i> {{ producto.piezas_por_paquete }} pzs</span>
+            </div>
+        </div>
+
+        <!-- Precio -->
+        <div class="producto-card-precio">
+            <span class="precio-valor">${{ producto.precio|floatformat:2 }}</span>
+            <span class="precio-label">por paquete</span>
+        </div>
+
+        <!-- Widget de carrito -->
+        <div class="producto-card-footer">
+            {% if esta_autenticado and not es_admin %}
+                {% if producto.stock > 0 %}
+                    <div class="carrito-widget"
+                         data-producto-id="{{ producto.id }}"
+                         data-stock="{{ producto.stock }}"
+                         data-url="{% url 'usuarios:set_cantidad' producto.id %}"
+                         data-csrf="{{ csrf_token }}">
+                        <div class="qty-wrapper">
+                            <button class="qty-btn qty-minus" type="button">−</button>
+                            <input type="number" class="qty-input"
+                                   value="{{ producto.cantidad_en_carrito }}"
+                                   min="0" max="{{ producto.stock }}">
+                            <button class="qty-btn qty-plus" type="button"
+                                {% if producto.cantidad_en_carrito >= producto.stock %}disabled{% endif %}>+</button>
+                        </div>
+                    </div>
+                {% else %}
+                    <button class="btn-agregar" disabled>
+                        <i class="fas fa-ban"></i> Agotado
+                    </button>
+                {% endif %}
+            {% elif not esta_autenticado %}
+                <a href="{% url 'usuarios:login' %}" class="btn-agregar" style="text-decoration:none;">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
 {% else %}
 <div class="sin-productos">
-    <div><i class="fas fa-inbox"></i></div>
+    <i class="fas fa-inbox"></i>
     <h4>No hay productos disponibles en esta categoría</h4>
-    <p>Por favor, intenta con otra categoría o vuelve al <a href="{% url 'catalogo:dashboard' %}">catálogo</a></p>
+    <p>Intenta con otra categoría o vuelve al <a href="{% url 'catalogo:dashboard' %}">catálogo</a>.</p>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    /* ── Widgets de cantidad ─────────────────────────────────────────────
+       Script inline: no depende de carrito.js externo.
+       Usa el mismo atributo data-initialized que initCarritoWidgets()
+       para evitar doble inicialización si el archivo externo sí cargó.     */
+    var CSRF = '{{ csrf_token }}';
+
+    document.querySelectorAll('.carrito-widget:not([data-initialized])').forEach(function (widget) {
+        widget.dataset.initialized = '1';
+
+        var stock = parseInt(widget.dataset.stock) || 0;
+        var url   = widget.dataset.url;
+        var input = widget.querySelector('.qty-input');
+        var minus = widget.querySelector('.qty-minus');
+        var plus  = widget.querySelector('.qty-plus');
+        if (!input || !url) return;
+
+        var timer = null;
+
+        function actualizarBotones(v) {
+            if (minus) minus.disabled = v <= 0;
+            if (plus)  plus.disabled  = v >= stock;
+        }
+
+        function enviar(v) {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                var fd = new FormData();
+                fd.append('cantidad', v);
+                fd.append('csrfmiddlewaretoken', CSRF);
+                fetch(url, {
+                    method: 'POST',
+                    body: fd,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data.ok) return;
+                    input.value = data.cantidad;
+                    actualizarBotones(data.cantidad);
+                    document.querySelectorAll('.carrito-badge').forEach(function (b) {
+                        b.textContent = data.items_total;
+                        b.style.display = data.items_total > 0 ? '' : 'none';
+                    });
+                })
+                .catch(function () {});
+            }, 280);
+        }
+
+        if (minus) minus.addEventListener('click', function () {
+            var v = Math.max(0, (parseInt(input.value) || 0) - 1);
+            input.value = v; actualizarBotones(v); enviar(v);
+        });
+
+        if (plus) plus.addEventListener('click', function () {
+            var v = Math.min(stock, (parseInt(input.value) || 0) + 1);
+            input.value = v; actualizarBotones(v); enviar(v);
+        });
+
+        input.addEventListener('change', function () {
+            var v = Math.max(0, Math.min(stock, parseInt(input.value) || 0));
+            input.value = v; actualizarBotones(v); enviar(v);
+        });
+
+        actualizarBotones(parseInt(input.value) || 0);
+    });
+
+    /* ── Buscador de categoría ───────────────────────────────────────── */
+    var buscador      = document.getElementById('buscador-categoria');
+    var sinResultados = document.getElementById('buscador-sin-resultados');
+    var grid          = document.getElementById('productos-grid');
+    if (!buscador || !grid) return;
+
+    buscador.addEventListener('input', function () {
+        var q = this.value.toLowerCase().trim();
+        var visibles = 0;
+
+        grid.querySelectorAll('.producto-card').forEach(function (card) {
+            var nombre  = (card.querySelector('.producto-card-nombre') || {}).textContent || '';
+            var meta    = (card.querySelector('.producto-card-meta')   || {}).textContent || '';
+            var visible = !q || nombre.toLowerCase().includes(q) || meta.toLowerCase().includes(q);
+            card.style.display = visible ? '' : 'none';
+            if (visible) visibles++;
+        });
+
+        if (sinResultados) {
+            sinResultados.style.display = (q && visibles === 0) ? '' : 'none';
+        }
+    });
+})();
+</script>
 {% endblock %}

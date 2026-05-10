@@ -4,108 +4,8 @@
 {% block title %}Dashboard - Catálogo de Productos{% endblock %}
 
 {% block extra_css %}
-<style>
-    .dashboard-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding: 2rem 0;
-    }
-
-    .dashboard-subtitle {
-        color: var(--text-secondary);
-        font-size: 1.05rem;
-        margin-top: 0.5rem;
-        letter-spacing: 0.3px;
-    }
-
-    .categorias-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 1.8rem;
-        margin-top: 2rem;
-    }
-
-    .categoria-card {
-        transition: all 0.3s ease;
-        border: 1px solid var(--dark-border);
-        border-radius: 12px;
-        overflow: hidden;
-        height: 100%;
-        cursor: pointer;
-        background-color: var(--dark-tertiary);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .categoria-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(59, 130, 246, 0.2);
-        border-color: var(--accent-blue);
-    }
-
-    .categoria-card-header {
-        background: linear-gradient(135deg, #25386b 0%, #1a2847 100%);
-        height: 180px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .categoria-card-header .emoji {
-        position: relative;
-        z-index: 1;
-        animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-
-    .categoria-card-body {
-        padding: 1.5rem;
-        text-align: center;
-    }
-
-    .categoria-card-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.3px;
-    }
-
-    .categoria-card-text {
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        line-height: 1.5;
-    }
-
-    .categoria-card-count {
-        display: inline-block;
-        background-color: rgba(59, 130, 246, 0.15);
-        color: var(--accent-blue);
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .categoria-card-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        height: 100%;
-    }
-
-    .categoria-card-link:hover {
-        text-decoration: none;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'catalogo/css/pages/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'catalogo/css/pages/catalogo.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -113,9 +13,21 @@
     <h1 class="border-bottom-accent pb-3">
         <i class="fas fa-th"></i> Catálogo de Productos
     </h1>
-    <p class="dashboard-subtitle">Selecciona una categoría para ver los productos disponibles</p>
+    <p class="dashboard-subtitle">Selecciona una categoría o busca un producto directamente</p>
 </div>
 
+<!-- Buscador global -->
+<div class="buscador-wrapper">
+    <i class="fas fa-search buscador-icon"></i>
+    <input type="text" id="buscador-global" class="buscador-input"
+           placeholder="Buscar productos por nombre o marca...">
+</div>
+
+<!-- Resultados de búsqueda -->
+<div id="resultados-busqueda" style="display:none;"></div>
+
+<!-- Categorías -->
+<div id="categorias-container">
 {% if categorias %}
     <div class="categorias-grid">
         {% for categoria in categorias %}
@@ -139,12 +51,135 @@
     </div>
 {% else %}
     <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <i class="fas fa-info-circle"></i> 
+        <i class="fas fa-info-circle"></i>
         <strong>No hay categorías disponibles.</strong>
         <br>
         <small>Ejecuta en terminal: <code>python manage.py cargar_datos</code></small>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 {% endif %}
+</div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+(function () {
+    const CSRF_TOKEN = '{{ csrf_token }}';
+    const buscador = document.getElementById('buscador-global');
+    const resultados = document.getElementById('resultados-busqueda');
+    const categoriasCont = document.getElementById('categorias-container');
+    const BUSCAR_URL = '{% url "catalogo:buscar" %}';
+    let timer = null;
+
+    if (!buscador) return;
+
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function renderCard(p, autenticado, esAdmin) {
+        const img = p.imagen_url
+            ? `<img src="${esc(p.imagen_url)}" alt="${esc(p.nombre)}" class="producto-card-img">`
+            : `<div class="producto-card-img-placeholder"><i class="fas fa-box"></i></div>`;
+
+        let overlay = '';
+        if (p.stock === 0) overlay = `<span class="stock-overlay">Agotado</span>`;
+        else if (p.stock <= 10) overlay = `<span class="stock-overlay stock-overlay-warn">Poco stock</span>`;
+
+        let footer = '';
+        if (autenticado && !esAdmin) {
+            if (p.stock > 0) {
+                const minusDis = p.cantidad_en_carrito <= 0 ? 'disabled' : '';
+                const plusDis  = p.cantidad_en_carrito >= p.stock ? 'disabled' : '';
+                footer = `<div class="carrito-widget"
+                    data-producto-id="${p.id}"
+                    data-stock="${p.stock}"
+                    data-url="${esc(p.url_set_cantidad)}"
+                    data-csrf="${esc(CSRF_TOKEN)}">
+                    <div class="qty-wrapper">
+                        <button class="qty-btn qty-minus" type="button" ${minusDis}>−</button>
+                        <input type="number" class="qty-input" value="${p.cantidad_en_carrito}" min="0" max="${p.stock}">
+                        <button class="qty-btn qty-plus" type="button" ${plusDis}>+</button>
+                    </div>
+                </div>`;
+            } else {
+                footer = `<button class="btn-agregar" disabled><i class="fas fa-ban"></i> Agotado</button>`;
+            }
+        } else if (!autenticado) {
+            footer = `<a href="{% url 'usuarios:login' %}" class="btn-agregar" style="text-decoration:none;">
+                <i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+        }
+
+        return `<div class="producto-card">
+            <div class="producto-card-img-wrap">${img}${overlay}</div>
+            <div class="producto-card-body">
+                <div class="producto-card-nombre">${esc(p.nombre)}</div>
+                <div class="producto-card-meta">${esc(p.marca)} · ${esc(p.gramaje)}</div>
+                <div class="producto-card-badges">
+                    <span class="badge-paquete">${esc(p.tipo_paquete)}</span>
+                    <span class="badge-piezas"><i class="fas fa-cubes"></i> ${p.piezas_por_paquete} pzs</span>
+                </div>
+                <div class="mt-1" style="font-size:.75rem; color:var(--text-muted);">
+                    <i class="fas fa-tag" style="font-size:.65rem;"></i> ${esc(p.categoria_nombre)}
+                </div>
+            </div>
+            <div class="producto-card-precio">
+                <span class="precio-valor">$${parseFloat(p.precio).toFixed(2)}</span>
+                <span class="precio-label">por paquete</span>
+            </div>
+            <div class="producto-card-footer">${footer}</div>
+        </div>`;
+    }
+
+    buscador.addEventListener('input', function () {
+        clearTimeout(timer);
+        const q = this.value.trim();
+
+        if (q.length < 2) {
+            resultados.style.display = 'none';
+            resultados.innerHTML = '';
+            categoriasCont.style.display = '';
+            return;
+        }
+
+        timer = setTimeout(() => {
+            fetch(BUSCAR_URL + '?q=' + encodeURIComponent(q), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Error en búsqueda');
+                return r.json();
+            })
+            .then(data => {
+                categoriasCont.style.display = 'none';
+
+                if (data.productos.length === 0) {
+                    resultados.innerHTML = `<div class="sin-productos">
+                        <i class="fas fa-search"></i>
+                        <h4>Sin resultados</h4>
+                        <p>Ningún producto coincide con "<strong>${esc(q)}</strong>".</p>
+                    </div>`;
+                } else {
+                    const cards = data.productos.map(p => renderCard(p, data.autenticado, data.es_admin)).join('');
+                    resultados.innerHTML = `
+                        <p class="mb-3" style="color:var(--text-secondary); font-size:.9rem;">
+                            <i class="fas fa-search"></i>
+                            ${data.productos.length} resultado${data.productos.length !== 1 ? 's' : ''} para
+                            "<strong>${esc(q)}</strong>"
+                        </p>
+                        <div class="productos-grid">${cards}</div>`;
+                    if (typeof initCarritoWidgets === 'function') initCarritoWidgets();
+                }
+
+                resultados.style.display = '';
+            })
+            .catch(() => {});
+        }, 350);
+    });
+})();
+</script>
+{% endblock %}

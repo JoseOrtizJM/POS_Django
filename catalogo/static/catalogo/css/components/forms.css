@@ -1,0 +1,45 @@
+/* ==================== FORMULARIOS ==================== */
+.form-control,
+.form-select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control::placeholder { color: var(--text-muted); }
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-input);
+    border-color: var(--border-focus);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(138, 106, 80, 0.22);
+    outline: none;
+}
+
+.form-select option { background-color: var(--bg-elevated); color: var(--text-primary); }
+
+label,
+.form-label {
+    color: var(--text-label) !important;
+    font-size: 0.84rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.01em;
+}
+
+.form-text {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.input-group-text {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}

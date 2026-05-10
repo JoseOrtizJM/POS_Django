@@ -1,0 +1,33 @@
+/* ==================== ALERTAS ==================== */
+.alert {
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.9rem;
+}
+
+.alert-success {
+    background-color: rgba(122, 144, 136, 0.12);
+    color: #b0c8c0;
+    border-left: 3px solid var(--accent-success);
+}
+
+.alert-danger {
+    background-color: rgba(192, 80, 96, 0.12);
+    color: #e0a0a8;
+    border-left: 3px solid var(--accent-danger);
+}
+
+.alert-warning {
+    background-color: rgba(176, 138, 94, 0.12);
+    color: #d4b888;
+    border-left: 3px solid var(--accent-warning);
+}
+
+.alert-info {
+    background-color: rgba(92, 107, 109, 0.14);
+    color: #a8bcbe;
+    border-left: 3px solid #5c6b6d;
+}
+
+.btn-close { filter: invert(0.55) sepia(0.1); }

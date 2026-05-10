@@ -1,0 +1,100 @@
+/* ==================== DASHBOARD — ENCABEZADO ==================== */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem 0 1rem;
+}
+
+.dashboard-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.3px;
+}
+
+/* ==================== DASHBOARD — GRID DE CATEGORÍAS ==================== */
+.categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.8rem;
+    margin-top: 2rem;
+}
+
+.categoria-card {
+    transition: all 0.3s ease;
+    border: 1px solid var(--dark-border);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+    cursor: pointer;
+    background-color: var(--dark-tertiary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.categoria-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(59, 130, 246, 0.2);
+    border-color: var(--accent-blue);
+}
+
+.categoria-card-header {
+    background: linear-gradient(135deg, #25386b 0%, #1a2847 100%);
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.categoria-card-header .emoji {
+    position: relative;
+    z-index: 1;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+}
+
+.categoria-card-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.categoria-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.3px;
+}
+
+.categoria-card-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.categoria-card-count {
+    display: inline-block;
+    background-color: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.categoria-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.categoria-card-link:hover { text-decoration: none; }

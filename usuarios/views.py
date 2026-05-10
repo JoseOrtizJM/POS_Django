@@ -397,3 +397,40 @@ def predeterminar_tarjeta(request, tarjeta_id):
     tarjeta.save()
     messages.success(request, f'Tarjeta ****{tarjeta.ultimos_cuatro} establecida como predeterminada.')
     return redirect('usuarios:mis_tarjetas')
+
+
+# ==================== CARRITO AJAX ====================
+
+@solo_usuario
+@require_POST
+def set_cantidad_carrito(request, producto_id):
+    """AJAX: establece la cantidad exacta de un producto. cantidad=0 lo elimina."""
+    from catalogo.models import Producto
+    usuario = _get_usuario(request)
+    producto = get_object_or_404(Producto, id=producto_id, activo=True)
+
+    try:
+        cantidad = int(request.POST.get('cantidad', 0))
+    except (ValueError, TypeError):
+        cantidad = 0
+
+    carrito = _get_o_crear_carrito(usuario)
+
+    if cantidad <= 0:
+        carrito.items.filter(producto=producto).delete()
+        cantidad = 0
+    else:
+        cantidad = min(cantidad, producto.stock)
+        item, _ = CarritoItem.objects.get_or_create(
+            carrito=carrito, producto=producto, defaults={'cantidad': cantidad}
+        )
+        item.cantidad = cantidad
+        item.save()
+
+    return JsonResponse({
+        'ok': True,
+        'cantidad': cantidad,
+        'items_total': carrito.total_items(),
+        'carrito_total': float(carrito.total()),
+        'subtotal': float(producto.precio * cantidad),
+    })

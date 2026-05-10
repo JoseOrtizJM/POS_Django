@@ -6,10 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}POS - Punto de Venta{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'catalogo/css/style.css' %}">
+    <!-- Vendor: Bootstrap y Font Awesome (servidos localmente para compatibilidad con todos los navegadores) -->
+    <link rel="stylesheet" href="{% static 'catalogo/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/vendor/fontawesome/css/all.min.css' %}">
 
+    <!-- Base: variables de tema, globales y navbar -->
+    <link rel="stylesheet" href="{% static 'catalogo/css/base/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/base/globals.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/base/navbar.css' %}">
+
+    <!-- Componentes reutilizables -->
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/cards.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/buttons.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/alerts.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo/css/components/badges.css' %}">
+
+    <!-- CSS específico de cada página -->
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
@@ -32,7 +46,6 @@
                         </li>
 
                         {% if es_admin %}
-                            <!-- Menú de administración -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-cog"></i> Administración
@@ -78,7 +91,6 @@
                             </li>
 
                         {% else %}
-                            <!-- Carrito (solo para usuarios) -->
                             <li class="nav-item">
                                 <a class="nav-link nav-carrito" href="{% url 'usuarios:carrito' %}" title="Mi carrito">
                                     <i class="fas fa-shopping-cart"></i>
@@ -87,8 +99,6 @@
                                     {% endif %}
                                 </a>
                             </li>
-
-                            <!-- Menú de usuario -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle"></i> {{ usuario_actual.get_nombre_corto }}
@@ -168,8 +178,15 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vendor JS -->
+    <script src="{% static 'catalogo/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Utilidades y lógica del carrito -->
+    <script src="{% static 'catalogo/js/utils.js' %}"></script>
+    <script src="{% static 'catalogo/js/carrito.js' %}"></script>
     <script src="{% static 'catalogo/js/main.js' %}"></script>
+
+    <!-- JS específico de cada página -->
     {% block extra_js %}{% endblock %}
 </body>
 </html>

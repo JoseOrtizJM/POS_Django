@@ -25,6 +25,9 @@ urlpatterns = [
     # Checkout
     path('checkout/', views.checkout, name='checkout'),
 
+    # Carrito AJAX
+    path('carrito/set/<int:producto_id>/', views.set_cantidad_carrito, name='set_cantidad'),
+
     # Tarjetas
     path('tarjetas/', views.mis_tarjetas, name='mis_tarjetas'),
     path('tarjetas/agregar/', views.agregar_tarjeta, name='agregar_tarjeta'),
