@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'categorias',
     'ventas',
     'rest_framework',
+    'anymail',
     'api',
 ]
 
