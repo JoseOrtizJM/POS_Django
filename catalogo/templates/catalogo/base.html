@@ -53,9 +53,10 @@
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <a class="dropdown-item" href="{% url 'administradores:panel' %}">
-                                            <i class="fas fa-chart-pie"></i> Panel Admin
+                                            <i class="fas fa-tachometer-alt"></i> Panel Admin
                                         </a>
                                     </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="{% url 'administradores:listar_productos' %}">
                                             <i class="fas fa-boxes"></i> Productos
@@ -68,12 +69,18 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item" href="{% url 'administradores:listar_usuarios' %}">
-                                            <i class="fas fa-users"></i> Usuarios
+                                            <i class="fas fa-users"></i> Clientes
                                         </a>
                                     </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="{% url 'administradores:ventas_dia' %}">
                                             <i class="fas fa-receipt"></i> Ventas del Día
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:ventas_reporte' %}">
+                                            <i class="fas fa-chart-bar"></i> Reporte de Ventas
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
@@ -84,10 +91,24 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li class="nav-item">
-                                <span class="nav-link" style="cursor:default; color:var(--accent-warning) !important;">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminPerfilDropdown" role="button" data-bs-toggle="dropdown"
+                                   style="color:var(--accent-warning) !important;">
                                     <i class="fas fa-user-shield"></i> {{ admin_actual.nombre_usuario }}
-                                </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:perfil' %}">
+                                            <i class="fas fa-id-card"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'administradores:logout' %}">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
                         {% else %}

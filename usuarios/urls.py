@@ -9,6 +9,11 @@ urlpatterns = [
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),
 
+    # Google OAuth
+    path('google/login/',       views.google_login,       name='google_login'),
+    path('google/callback/',    views.google_callback,    name='google_callback'),
+    path('completar-perfil/',   views.completar_perfil,   name='completar_perfil'),
+
     # Perfil
     path('perfil/', views.mi_perfil, name='perfil'),
 

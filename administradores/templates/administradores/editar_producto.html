@@ -44,9 +44,10 @@
                         <div class="col-md-4">
                             <label class="form-label">Tipo de Paquete *</label>
                             <select name="tipo_paquete" class="form-select" required>
-                                {% for tipo in "Paquete,Caja,Bulto,Costal"|split:"," %}
-                                    <option value="{{ tipo }}" {% if tipo == producto.tipo_paquete %}selected{% endif %}>{{ tipo }}</option>
-                                {% endfor %}
+                                <option value="Paquete" {% if producto.tipo_paquete == "Paquete" %}selected{% endif %}>Paquete</option>
+                                <option value="Caja"    {% if producto.tipo_paquete == "Caja"    %}selected{% endif %}>Caja</option>
+                                <option value="Bulto"   {% if producto.tipo_paquete == "Bulto"   %}selected{% endif %}>Bulto</option>
+                                <option value="Costal"  {% if producto.tipo_paquete == "Costal"  %}selected{% endif %}>Costal</option>
                             </select>
                         </div>
                         <div class="col-md-4">

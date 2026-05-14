@@ -1,0 +1,227 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil - Administrador{% endblock %}
+
+{% block extra_css %}
+<style>
+.perfil-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: var(--accent-primary-glow);
+    border: 3px solid var(--accent-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; color: var(--accent-primary);
+    flex-shrink: 0;
+}
+.stat-pill {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 1rem 1.25rem; text-align: center;
+}
+.stat-pill .val  { font-size: 1.7rem; font-weight: 700; line-height: 1; }
+.stat-pill .lbl  { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); margin-top: .25rem; }
+.section-card    { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mt-4 mb-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0" style="font-size:1.5rem;font-weight:700;">
+            <i class="fas fa-user-shield" style="color:var(--accent-warning);"></i>
+            Mi Perfil
+        </h1>
+        <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Panel
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Columna izquierda: info + estadísticas -->
+        <div class="col-lg-4">
+
+            <!-- Tarjeta de identidad -->
+            <div class="section-card mb-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="perfil-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">{{ admin.nombre_usuario }}</h4>
+                        <p class="text-muted mb-0" style="font-size:.85rem;">{{ admin.email }}</p>
+                        <span class="badge mt-1" style="background:var(--accent-warning-glow);color:var(--accent-warning);">
+                            <i class="fas fa-shield-alt"></i> Administrador
+                        </span>
+                    </div>
+                </div>
+                <hr style="border-color:var(--border-color);opacity:.5;">
+                <div style="font-size:.85rem;">
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Estado</span>
+                        {% if admin.activo %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Miembro desde</span>
+                        <span>{{ admin.creado_en|date:"d/m/Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Última actualización</span>
+                        <span>{{ admin.actualizado_en|date:"d/m/Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas del sistema -->
+            <div class="section-card">
+                <h6 class="fw-semibold mb-3" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">
+                    Resumen del Sistema
+                </h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <p class="val mb-0" style="color:var(--accent-primary);">{{ total_productos }}</p>
+                            <p class="lbl mb-0">Productos</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <p class="val mb-0" style="color:var(--accent-success);">{{ total_usuarios }}</p>
+                            <p class="lbl mb-0">Clientes</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <p class="val mb-0" style="color:var(--accent-warning);">{{ total_ventas }}</p>
+                            <p class="lbl mb-0">Ventas</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <p class="val mb-0" style="color:var(--accent-danger);font-size:1.2rem;">${{ total_ingresos|floatformat:0 }}</p>
+                            <p class="lbl mb-0">Ingresos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna derecha: formularios -->
+        <div class="col-lg-8">
+
+            <!-- Editar datos -->
+            <div class="section-card mb-4">
+                <h5 class="fw-semibold mb-4">
+                    <i class="fas fa-id-card me-2" style="color:var(--accent-primary);"></i>
+                    Información de la Cuenta
+                </h5>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="actualizar_datos">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size:.82rem;font-weight:600;">Nombre de usuario</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                <input type="text" name="nombre_usuario" class="form-control"
+                                       value="{{ admin.nombre_usuario }}" required maxlength="50">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size:.82rem;font-weight:600;">Correo electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="email" class="form-control"
+                                       value="{{ admin.email }}" required>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Cambiar contraseña -->
+            <div class="section-card">
+                <h5 class="fw-semibold mb-4">
+                    <i class="fas fa-lock me-2" style="color:var(--accent-warning);"></i>
+                    Cambiar Contraseña
+                </h5>
+
+                {% if error_pw %}
+                <div class="alert alert-danger py-2 mb-3" style="font-size:.85rem;">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error_pw }}
+                </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="cambiar_password">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:.82rem;font-weight:600;">Contraseña actual</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                <input type="password" name="password_actual" class="form-control"
+                                       placeholder="Ingresa tu contraseña actual" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size:.82rem;font-weight:600;">Nueva contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" name="password_nueva" class="form-control" id="pwNueva"
+                                       placeholder="Mínimo 6 caracteres" required minlength="6">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size:.82rem;font-weight:600;">Confirmar contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" name="password_confirmar" class="form-control" id="pwConfirmar"
+                                       placeholder="Repite la nueva contraseña" required>
+                            </div>
+                            <div id="pwMatch" class="mt-1" style="font-size:.75rem;display:none;"></div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                                <i class="fas fa-shield-alt"></i> Actualizar contraseña
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación en tiempo real de coincidencia de contraseñas
+const pwNueva = document.getElementById('pwNueva');
+const pwConf  = document.getElementById('pwConfirmar');
+const pwMatch = document.getElementById('pwMatch');
+
+function checkMatch() {
+    if (!pwConf.value) { pwMatch.style.display = 'none'; return; }
+    const ok = pwNueva.value === pwConf.value;
+    pwMatch.style.display = '';
+    pwMatch.style.color = ok ? 'var(--accent-success)' : 'var(--accent-danger)';
+    pwMatch.textContent  = ok ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden';
+}
+
+pwNueva.addEventListener('input', checkMatch);
+pwConf.addEventListener('input',  checkMatch);
+</script>
+{% endblock %}

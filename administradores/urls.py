@@ -14,6 +14,7 @@ urlpatterns = [
     path('productos/crear/', views.crear_producto, name='crear_producto'),
     path('productos/editar/<int:producto_id>/', views.editar_producto, name='editar_producto'),
     path('productos/eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('productos/toggle/<int:producto_id>/', views.toggle_producto, name='toggle_producto'),
 
     # Categorías
     path('categorias/', views.listar_categorias, name='listar_categorias'),
@@ -25,7 +26,11 @@ urlpatterns = [
     path('usuarios/', views.listar_usuarios, name='listar_usuarios'),
     path('usuarios/toggle/<int:usuario_id>/', views.toggle_usuario, name='toggle_usuario'),
 
+    # Perfil
+    path('perfil/', views.perfil_admin, name='perfil'),
+
     # Ventas
     path('ventas/', views.ventas_dia, name='ventas_dia'),
+    path('ventas/reporte/', views.ventas_reporte, name='ventas_reporte'),
     path('ventas/<int:venta_id>/', views.detalle_venta, name='detalle_venta'),
 ]

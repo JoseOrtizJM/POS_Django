@@ -3,93 +3,185 @@
 
 {% block title %}Gestión de Productos - POS{% endblock %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center my-4">
-    <h1><i class="fas fa-boxes"></i> Gestión de Productos</h1>
-    <div class="d-flex gap-2">
-        <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Panel
-        </a>
-        <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Nuevo Producto
-        </a>
-    </div>
-</div>
+{% block extra_css %}
+<style>
+.filter-bar { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+.badge-stock-ok   { background: var(--accent-success-glow); color: var(--accent-success); }
+.badge-stock-low  { background: var(--accent-warning-glow); color: var(--accent-warning); }
+.badge-stock-zero { background: var(--accent-danger-glow);  color: var(--accent-danger); }
+.badge-inactivo   { background: rgba(120,120,120,.15);      color: #888; }
+.product-img-thumb { width: 38px; height: 38px; object-fit: cover; border-radius: 6px; }
+.product-img-placeholder { width: 38px; height: 38px; border-radius: 6px; background: var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: .9rem; flex-shrink: 0; }
+</style>
+{% endblock %}
 
-{% for categoria in categorias %}
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ categoria.icono_emoji }} {{ categoria.nombre }}</h5>
-        <span class="badge bg-primary">{{ categoria.productos.count }} producto(s)</span>
-    </div>
-    <div class="card-body p-0">
-        {% if categoria.productos.all %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Nombre / Marca</th>
-                        <th>Gramaje</th>
-                        <th>Paquete</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for producto in categoria.productos.all %}
-                    <tr>
-                        <td>
-                            <strong>{{ producto.nombre }}</strong>
-                            <small class="d-block text-muted">{{ producto.marca }}</small>
-                        </td>
-                        <td><span style="font-size:.85rem;">{{ producto.gramaje }}</span></td>
-                        <td>
-                            <small>{{ producto.tipo_paquete }} · {{ producto.piezas_por_paquete }} pzs</small>
-                        </td>
-                        <td><strong>${{ producto.precio|floatformat:2 }}</strong></td>
-                        <td>
-                            {% if producto.stock > 20 %}
-                                <span class="badge bg-success">{{ producto.stock }} paq.</span>
-                            {% elif producto.stock > 0 %}
-                                <span class="badge bg-warning">{{ producto.stock }} paq.</span>
-                            {% else %}
-                                <span class="badge bg-danger">Agotado</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'administradores:editar_producto' producto.id %}"
-                               class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form method="post" action="{% url 'administradores:eliminar_producto' producto.id %}"
-                                  class="d-inline"
-                                  onsubmit="return confirm('¿Eliminar &quot;{{ producto.nombre }}&quot;?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block content %}
+<div class="mt-4 mb-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0" style="font-size:1.5rem;font-weight:700;">
+                <i class="fas fa-boxes" style="color:var(--accent-primary);"></i>
+                Gestión de Productos
+            </h1>
+            <p class="text-muted mb-0" style="font-size:.85rem;">{{ productos.count }} producto(s) encontrado(s)</p>
         </div>
-        {% else %}
-        <p class="text-muted text-center py-3 mb-0">Sin productos en esta categoría.</p>
-        {% endif %}
+        <div class="d-flex gap-2">
+            <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Panel
+            </a>
+            <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+        </div>
     </div>
-</div>
-{% empty %}
-<div class="card">
-    <div class="card-body text-center py-5">
-        <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
-        <h4 class="text-muted">No hay categorías creadas</h4>
-        <a href="{% url 'administradores:crear_categoria' %}" class="btn btn-primary mt-2">
-            <i class="fas fa-plus"></i> Crear primera categoría
-        </a>
+
+    <!-- ===== BARRA DE FILTROS ===== -->
+    <form method="get" class="filter-bar">
+        <div class="row g-2 align-items-end">
+
+            <div class="col-12 col-md-4">
+                <label class="form-label mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Buscar</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Nombre o marca…" value="{{ q }}">
+                </div>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Categoría</label>
+                <select name="categoria" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.icono_emoji }} {{ cat.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Estado</label>
+                <select name="estado" class="form-select form-select-sm">
+                    <option value="" {% if estado == '' %}selected{% endif %}>Todos</option>
+                    <option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activos</option>
+                    <option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivos</option>
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Stock</label>
+                <select name="stock" class="form-select form-select-sm">
+                    <option value="" {% if stock_filtro == '' %}selected{% endif %}>Cualquiera</option>
+                    <option value="sin_stock"  {% if stock_filtro == 'sin_stock' %}selected{% endif %}>Agotado</option>
+                    <option value="bajo"       {% if stock_filtro == 'bajo' %}selected{% endif %}>Bajo (≤5)</option>
+                    <option value="disponible" {% if stock_filtro == 'disponible' %}selected{% endif %}>Disponible</option>
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <a href="{% url 'administradores:listar_productos' %}" class="btn btn-outline-secondary btn-sm" title="Limpiar filtros">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- ===== TABLA DE PRODUCTOS ===== -->
+    <div class="card" style="border-radius:14px;border-color:var(--border-color);">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size:.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="width:42px;"></th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Gramaje</th>
+                            <th>Paquete</th>
+                            <th>Precio</th>
+                            <th class="text-center">Stock</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr {% if not producto.activo %}style="opacity:.55;"{% endif %}>
+                            <td>
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen.url }}" class="product-img-thumb" alt="">
+                                {% else %}
+                                    <div class="product-img-placeholder"><i class="fas fa-box"></i></div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ producto.nombre }}</strong>
+                                <small class="d-block text-muted">{{ producto.marca }}</small>
+                            </td>
+                            <td>{{ producto.categoria.icono_emoji }} {{ producto.categoria.nombre }}</td>
+                            <td><span style="font-size:.82rem;">{{ producto.gramaje }}</span></td>
+                            <td><small>{{ producto.tipo_paquete }} · {{ producto.piezas_por_paquete }} pzs</small></td>
+                            <td><strong>${{ producto.precio|floatformat:2 }}</strong></td>
+                            <td class="text-center">
+                                {% if producto.stock == 0 %}
+                                    <span class="badge badge-stock-zero">Agotado</span>
+                                {% elif producto.stock <= 5 %}
+                                    <span class="badge badge-stock-low">{{ producto.stock }}</span>
+                                {% else %}
+                                    <span class="badge badge-stock-ok">{{ producto.stock }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if producto.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-inactivo">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a href="{% url 'administradores:editar_producto' producto.id %}"
+                                       class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'administradores:toggle_producto' producto.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-sm {% if producto.activo %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                                title="{% if producto.activo %}Desactivar{% else %}Activar{% endif %}">
+                                            <i class="fas {% if producto.activo %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'administradores:eliminar_producto' producto.id %}" class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar &quot;{{ producto.nombre }}&quot;? Esta acción no se puede deshacer.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <i class="fas fa-search fa-2x d-block mb-2" style="opacity:.3;"></i>
+                                No se encontraron productos con los filtros aplicados.
+                                <a href="{% url 'administradores:listar_productos' %}" class="d-block mt-2 text-primary">Limpiar filtros</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
 </div>
-{% endfor %}
 {% endblock %}

@@ -1,0 +1,299 @@
+{% extends 'catalogo/base.html' %}
+{% load static %}
+
+{% block title %}Reporte de Ventas - POS{% endblock %}
+
+{% block extra_css %}
+<style>
+.periodo-btn { border-radius: 8px; padding: .45rem 1rem; font-size: .85rem; font-weight: 500; transition: all .15s; }
+.periodo-btn.active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
+
+.stat-box {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 1.25rem 1.5rem;
+}
+.stat-box .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); margin-bottom: .3rem; }
+.stat-box .value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+
+.chart-wrap {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 1.25rem;
+}
+
+.custom-date-row { display: none; }
+.custom-date-row.visible { display: flex; }
+
+.search-ventas { max-width: 280px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mt-4 mb-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0" style="font-size:1.5rem;font-weight:700;">
+                <i class="fas fa-chart-bar" style="color:var(--accent-primary);"></i>
+                Reporte de Ventas
+            </h1>
+            <p class="text-muted mb-0" style="font-size:.85rem;">{{ titulo_periodo }}</p>
+        </div>
+        <a href="{% url 'administradores:panel' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Panel
+        </a>
+    </div>
+
+    <!-- ===== SELECTOR DE PERÍODO ===== -->
+    <div class="chart-wrap mb-4">
+        <form method="get" id="formPeriodo">
+            <input type="hidden" name="periodo" id="inputPeriodo" value="{{ periodo }}">
+            <input type="hidden" name="desde" id="inputDesde" value="{{ fecha_desde_str }}">
+            <input type="hidden" name="hasta" id="inputHasta" value="{{ fecha_hasta_str }}">
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span style="font-size:.8rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Período:</span>
+                <button type="button" class="btn btn-sm periodo-btn {% if periodo == 'hoy' %}active{% else %}btn-outline-secondary{% endif %}"
+                        onclick="setPeriodo('hoy')">
+                    <i class="fas fa-sun"></i> Hoy
+                </button>
+                <button type="button" class="btn btn-sm periodo-btn {% if periodo == 'semana' %}active{% else %}btn-outline-secondary{% endif %}"
+                        onclick="setPeriodo('semana')">
+                    <i class="fas fa-calendar-week"></i> Esta semana
+                </button>
+                <button type="button" class="btn btn-sm periodo-btn {% if periodo == 'mes' %}active{% else %}btn-outline-secondary{% endif %}"
+                        onclick="setPeriodo('mes')">
+                    <i class="fas fa-calendar-alt"></i> Este mes
+                </button>
+                <button type="button" class="btn btn-sm periodo-btn {% if periodo == 'personalizado' %}active{% else %}btn-outline-secondary{% endif %}"
+                        onclick="setPeriodo('personalizado')" id="btnPersonalizado">
+                    <i class="fas fa-calendar-day"></i> Personalizado
+                </button>
+            </div>
+
+            <!-- Date picker rango personalizado -->
+            <div class="custom-date-row align-items-center gap-3 flex-wrap {% if periodo == 'personalizado' %}visible{% endif %}" id="customDates">
+                <div class="d-flex align-items-center gap-2">
+                    <label style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;">Desde:</label>
+                    <input type="date" class="form-control form-control-sm" id="pickerDesde"
+                           value="{{ fecha_desde_str }}" max="{{ hoy|date:'Y-m-d' }}"
+                           onchange="document.getElementById('inputDesde').value=this.value">
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;">Hasta:</label>
+                    <input type="date" class="form-control form-control-sm" id="pickerHasta"
+                           value="{{ fecha_hasta_str }}" max="{{ hoy|date:'Y-m-d' }}"
+                           onchange="document.getElementById('inputHasta').value=this.value">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-search"></i> Aplicar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== KPIs ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <p class="label">Total Ventas</p>
+                <p class="value">{{ total_ventas }}</p>
+                <small class="text-muted">transacciones</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <p class="label">Ingresos</p>
+                <p class="value" style="color:var(--accent-success);">${{ total_periodo|floatformat:2 }}</p>
+                <small class="text-muted">total del período</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <p class="label">Ticket Promedio</p>
+                <p class="value">${{ ticket_promedio|floatformat:2 }}</p>
+                <small class="text-muted">por venta</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <p class="label">Métodos de Pago</p>
+                <p class="value" style="font-size:1rem;padding-top:.4rem;">
+                    <i class="fas fa-money-bill" style="color:var(--accent-success);"></i>
+                    {{ ventas_efectivo_count }}
+                    &nbsp;
+                    <i class="fas fa-credit-card" style="color:var(--accent-primary);"></i>
+                    {{ ventas_tarjeta_count }}
+                </p>
+                <small class="text-muted">${{ pago_efectivo_monto|floatformat:2 }} / ${{ pago_tarjeta_monto|floatformat:2 }}</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GRÁFICA + TOP PRODUCTOS ===== -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-8">
+            <div class="chart-wrap h-100">
+                <h6 class="fw-semibold mb-3">
+                    <i class="fas fa-chart-line me-1" style="color:var(--accent-primary);"></i>
+                    Ingresos por Día — {{ titulo_periodo }}
+                </h6>
+                <canvas id="chartPeriodo" height="110"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="chart-wrap h-100">
+                <h6 class="fw-semibold mb-3">
+                    <i class="fas fa-fire me-1" style="color:var(--accent-danger);"></i>
+                    Top Productos
+                </h6>
+                {% if top_productos %}
+                    {% for p in top_productos %}
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between" style="font-size:.8rem;">
+                            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65%;font-weight:600;">{{ p.nombre_producto }}</span>
+                            <span class="text-muted">{{ p.total_cantidad }} paq.</span>
+                        </div>
+                        {% with pct=p.total_ingresos %}
+                        <div style="background:var(--border-color);border-radius:4px;height:5px;overflow:hidden;">
+                            <div style="height:100%;background:var(--accent-primary);border-radius:4px;width:{{ forloop.revcounter0|add:1 }}0%;"></div>
+                        </div>
+                        {% endwith %}
+                        <p style="font-size:.72rem;color:var(--accent-success);text-align:right;margin:.1rem 0 0;">${{ p.total_ingresos|floatformat:2 }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3 mb-0" style="font-size:.85rem;">Sin ventas en el período.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TABLA DE VENTAS ===== -->
+    <div class="chart-wrap">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h6 class="fw-semibold mb-0">
+                <i class="fas fa-list me-1" style="color:var(--accent-primary);"></i>
+                Detalle de Ventas
+                <span class="badge bg-primary ms-1">{{ total_ventas }}</span>
+            </h6>
+            <input type="text" class="form-control form-control-sm search-ventas"
+                   placeholder="Buscar por cliente o #venta…"
+                   id="buscarVenta" oninput="filtrarVentas()">
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size:.85rem;" id="tablaVentas">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Artículos</th>
+                        <th>Método de Pago</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyVentas">
+                    {% for venta in ventas %}
+                    <tr class="fila-venta"
+                        data-buscar="{{ venta.id }} {% if venta.usuario %}{{ venta.usuario.nombre_completo }} {{ venta.usuario.nombre_usuario }}{% endif %}">
+                        <td><strong>#{{ venta.id }}</strong></td>
+                        <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+                        <td>{{ venta.fecha|date:"H:i" }}</td>
+                        <td>
+                            {% if venta.usuario %}
+                                <strong>{{ venta.usuario.nombre_completo }}</strong>
+                                <small class="d-block text-muted">@{{ venta.usuario.nombre_usuario }}</small>
+                            {% else %}
+                                <span class="text-muted">Usuario eliminado</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-primary">{{ venta.items.count }} art.</span></td>
+                        <td>
+                            {% if venta.metodo_pago == 'tarjeta' %}
+                                <i class="fas fa-credit-card" style="color:var(--accent-primary);"></i>
+                            {% else %}
+                                <i class="fas fa-money-bill" style="color:var(--accent-success);"></i>
+                            {% endif %}
+                            {{ venta.get_metodo_pago_display }}
+                            {% if venta.detalle_pago %}
+                                <small class="d-block text-muted">{{ venta.detalle_pago }}</small>
+                            {% endif %}
+                        </td>
+                        <td><strong style="color:var(--accent-success);">${{ venta.total|floatformat:2 }}</strong></td>
+                        <td>
+                            <a href="{% url 'administradores:detalle_venta' venta.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fas fa-receipt fa-2x d-block mb-2" style="opacity:.3;"></i>
+                            No hay ventas en este período.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+// Gráfica del período
+const accentPrimary = getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim() || '#4f8ef7';
+
+new Chart(document.getElementById('chartPeriodo').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ labels_periodo|safe }},
+        datasets: [{
+            label: 'Ingresos ($)',
+            data: {{ datos_periodo|safe }},
+            backgroundColor: accentPrimary + '88',
+            borderColor: accentPrimary,
+            borderWidth: 1.5,
+            borderRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { font: { size: 10 }, maxRotation: 45 } },
+            y: {
+                grid: { color: 'rgba(255,255,255,.06)' },
+                ticks: { font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
+            }
+        }
+    }
+});
+
+// Selector de período
+function setPeriodo(p) {
+    document.getElementById('inputPeriodo').value = p;
+    document.getElementById('customDates').classList.toggle('visible', p === 'personalizado');
+    if (p !== 'personalizado') document.getElementById('formPeriodo').submit();
+}
+
+// Filtro de búsqueda en la tabla
+function filtrarVentas() {
+    const q = document.getElementById('buscarVenta').value.toLowerCase();
+    document.querySelectorAll('.fila-venta').forEach(fila => {
+        const texto = fila.getAttribute('data-buscar').toLowerCase();
+        fila.style.display = texto.includes(q) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

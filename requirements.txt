@@ -1,0 +1,20 @@
+# Django & REST Framework
+Django==6.0.4
+djangorestframework==3.17.1
+
+# Base de datos PostgreSQL
+psycopg2-binary==2.9.12
+
+# Manejo de imágenes (productos)
+Pillow==12.2.0
+
+# Autenticación JWT
+PyJWT==2.12.1
+
+# Peticiones HTTP
+requests==2.33.1
+
+# Dependencias de Django (instaladas automáticamente)
+asgiref==3.11.1
+sqlparse==0.5.5
+tzdata==2026.1

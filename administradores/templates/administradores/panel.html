@@ -3,143 +3,509 @@
 
 {% block title %}Panel de Administración - POS{% endblock %}
 
+{% block extra_css %}
+<style>
+.admin-panel { padding-bottom: 3rem; }
+
+/* KPI Cards */
+.kpi-card {
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    transition: transform .18s, box-shadow .18s;
+    overflow: hidden;
+}
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.18); }
+.kpi-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+}
+.kpi-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); margin-bottom: .2rem; }
+.kpi-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+.kpi-sub   { font-size: .78rem; margin-top: .25rem; }
+
+/* Quick actions */
+.quick-action {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .5rem; padding: 1.2rem .75rem; border-radius: 12px;
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    text-decoration: none; color: var(--text-primary);
+    font-size: .82rem; font-weight: 500; text-align: center;
+    transition: all .18s;
+}
+.quick-action:hover { background: var(--accent-primary-glow); border-color: var(--accent-primary); color: var(--accent-primary); transform: translateY(-2px); }
+.quick-action i { font-size: 1.6rem; }
+
+/* Charts */
+.chart-card { border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); }
+
+/* Alert badge stock */
+.stock-zero  { background: var(--accent-danger-glow); color: var(--accent-danger); }
+.stock-low   { background: var(--accent-warning-glow); color: var(--accent-warning); }
+
+/* Section title */
+.section-title {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 1rem;
+}
+
+.top-bar-label {
+    font-size: .72rem; color: var(--text-muted);
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center my-4">
-    <h1><i class="fas fa-chart-pie"></i> Panel de Administración</h1>
-    <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success">
-        <i class="fas fa-plus"></i> Nuevo Producto
-    </a>
-</div>
+<div class="admin-panel">
 
-<!-- Tarjetas de estadísticas -->
-<div class="row g-4 mb-5">
-    <div class="col-md-3">
-        <div class="card stat-card stat-card-blue h-100">
-            <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-primary-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-box-open" style="color:var(--accent-primary);"></i>
-                </div>
-                <div>
-                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Productos</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_productos }}</h2>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'administradores:listar_productos' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
-            </div>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <div>
+            <h1 class="mb-0" style="font-size:1.6rem;font-weight:700;">
+                <i class="fas fa-tachometer-alt" style="color:var(--accent-primary);"></i>
+                Panel de Administración
+            </h1>
+            <p class="text-muted mb-0" style="font-size:.85rem;">{{ hoy|date:"l, j \d\e F \d\e Y" }}</p>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stat-card stat-card-green h-100">
-            <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-success-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-users" style="color:var(--accent-success);"></i>
-                </div>
-                <div>
-                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Clientes</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_usuarios }}</h2>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'administradores:listar_usuarios' %}" class="btn btn-sm btn-outline-success">Ver todos</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stat-card stat-card-amber h-100">
-            <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-warning-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-tags" style="color:var(--accent-warning);"></i>
-                </div>
-                <div>
-                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Categorías</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ total_categorias }}</h2>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'administradores:listar_categorias' %}" class="btn btn-sm btn-outline-secondary">Gestionar</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100" style="border-color:var(--accent-danger);">
-            <div class="card-body py-4 d-flex align-items-center gap-4">
-                <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-danger-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fas fa-receipt" style="color:var(--accent-danger);"></i>
-                </div>
-                <div>
-                    <p class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;">Ventas hoy</p>
-                    <h2 class="mb-0 fw-bold" style="font-size:1.9rem;">{{ ventas_hoy }}</h2>
-                    <small style="color:var(--accent-success);">${{ total_ventas_hoy|floatformat:2 }}</small>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'administradores:ventas_dia' %}" class="btn btn-sm btn-outline-danger">Ver ventas</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Productos recientes -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-clock"></i> Productos Recientes</h5>
         <div class="d-flex gap-2">
-            <a href="{% url 'administradores:listar_productos' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
-            <a href="{% url 'administradores:crear_producto' %}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Agregar</a>
+            <a href="{% url 'administradores:crear_producto' %}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+            <a href="{% url 'administradores:crear_categoria' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-folder-plus"></i> Nueva Categoría
+            </a>
         </div>
     </div>
-    <div class="card-body p-0">
+
+    <!-- ===== KPI ROW 1: Ventas ===== -->
+    <p class="section-title"><i class="fas fa-chart-line me-1"></i>Resumen de Ventas</p>
+    <div class="row g-3 mb-3">
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-danger-glow);">
+                        <i class="fas fa-sun" style="color:var(--accent-danger);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Hoy</p>
+                        <p class="kpi-value mb-0">{{ ventas_hoy }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0" style="color:var(--accent-success);">${{ total_ventas_hoy|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-primary-glow);">
+                        <i class="fas fa-calendar-week" style="color:var(--accent-primary);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Semana</p>
+                        <p class="kpi-value mb-0">{{ ventas_semana }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0" style="color:var(--accent-success);">${{ total_ventas_semana|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-success-glow);">
+                        <i class="fas fa-calendar-alt" style="color:var(--accent-success);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Este Mes</p>
+                        <p class="kpi-value mb-0">{{ ventas_mes }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0" style="color:var(--accent-success);">${{ total_ventas_mes|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-primary-glow);">
+                        <i class="fas fa-boxes" style="color:var(--accent-primary);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Productos</p>
+                        <p class="kpi-value mb-0">{{ total_productos }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0 text-muted">{{ total_productos_inactivos }} inactivos</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-success-glow);">
+                        <i class="fas fa-users" style="color:var(--accent-success);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Clientes</p>
+                        <p class="kpi-value mb-0">{{ total_usuarios }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0 text-muted">{{ usuarios_activos }} activos</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="kpi-card p-3">
+                <div class="d-flex align-items-center gap-3 mb-1">
+                    <div class="kpi-icon" style="background:var(--accent-warning-glow);">
+                        <i class="fas fa-exclamation-triangle" style="color:var(--accent-warning);"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label mb-0">Stock bajo</p>
+                        <p class="kpi-value mb-0">{{ productos_sin_stock|add:productos_bajo_stock }}</p>
+                    </div>
+                </div>
+                <p class="kpi-sub mb-0 text-muted">{{ productos_sin_stock }} agotados</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== QUICK ACTIONS ===== -->
+    <p class="section-title mt-3"><i class="fas fa-bolt me-1"></i>Accesos Rápidos</p>
+    <div class="row g-2 mb-4">
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:crear_producto' %}" class="quick-action">
+                <i class="fas fa-plus-circle" style="color:var(--accent-success);"></i>
+                Nuevo Producto
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:listar_productos' %}" class="quick-action">
+                <i class="fas fa-boxes" style="color:var(--accent-primary);"></i>
+                Ver Productos
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:listar_categorias' %}" class="quick-action">
+                <i class="fas fa-tags" style="color:var(--accent-warning);"></i>
+                Categorías
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:listar_usuarios' %}" class="quick-action">
+                <i class="fas fa-user-friends" style="color:var(--accent-success);"></i>
+                Clientes
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:ventas_dia' %}" class="quick-action">
+                <i class="fas fa-receipt" style="color:var(--accent-danger);"></i>
+                Ventas Hoy
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:ventas_reporte' %}" class="quick-action">
+                <i class="fas fa-chart-bar" style="color:var(--accent-primary);"></i>
+                Reportes
+            </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{% url 'administradores:perfil' %}" class="quick-action">
+                <i class="fas fa-user-shield" style="color:var(--accent-warning);"></i>
+                Mi Perfil
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== CHARTS ROW ===== -->
+    <div class="row g-3 mb-4">
+
+        <!-- Gráfica ventas 7/30 días -->
+        <div class="col-lg-8">
+            <div class="chart-card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-chart-line me-1" style="color:var(--accent-primary);"></i>
+                        Ingresos por Día
+                    </h6>
+                    <div class="btn-group btn-group-sm" id="btnPeriodo">
+                        <button class="btn btn-primary active" onclick="cambiarPeriodo('7')">7 días</button>
+                        <button class="btn btn-outline-primary" onclick="cambiarPeriodo('30')">30 días</button>
+                    </div>
+                </div>
+                <canvas id="chartVentas" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfica métodos de pago -->
+        <div class="col-lg-4">
+            <div class="chart-card p-3 h-100">
+                <h6 class="mb-3 fw-semibold">
+                    <i class="fas fa-credit-card me-1" style="color:var(--accent-warning);"></i>
+                    Métodos de Pago (mes)
+                </h6>
+                <canvas id="chartPagos" height="160"></canvas>
+                <div class="row text-center mt-3">
+                    <div class="col-6">
+                        <p class="mb-0" style="font-size:.75rem;color:var(--text-muted);">Efectivo</p>
+                        <strong style="color:var(--accent-success);">${{ pago_efectivo|floatformat:2 }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-0" style="font-size:.75rem;color:var(--text-muted);">Tarjeta</p>
+                        <strong style="color:var(--accent-primary);">${{ pago_tarjeta|floatformat:2 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOP PRODUCTOS + ALERTAS STOCK ===== -->
+    <div class="row g-3 mb-4">
+
+        <!-- Top 5 productos más vendidos -->
+        <div class="col-lg-6">
+            <div class="chart-card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-fire me-1" style="color:var(--accent-danger);"></i>
+                        Top Productos del Mes
+                    </h6>
+                    <a href="{% url 'administradores:ventas_reporte' %}?periodo=mes" class="btn btn-sm btn-outline-primary">Ver reporte</a>
+                </div>
+                {% if top_productos %}
+                    {% for p in top_productos %}
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span style="width:22px;height:22px;border-radius:50%;background:var(--accent-primary-glow);color:var(--accent-primary);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ forloop.counter }}</span>
+                        <div class="flex-grow-1" style="min-width:0;">
+                            <p class="mb-0" style="font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.nombre_producto }}</p>
+                            <div class="d-flex justify-content-between">
+                                <span class="top-bar-label">{{ p.total_cantidad }} paq.</span>
+                                <span class="top-bar-label">${{ p.total_ingresos|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}<hr class="my-2" style="opacity:.12;">{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3 mb-0" style="font-size:.85rem;">Sin ventas este mes.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Alertas de stock -->
+        <div class="col-lg-6">
+            <div class="chart-card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-exclamation-triangle me-1" style="color:var(--accent-warning);"></i>
+                        Alertas de Stock
+                    </h6>
+                    <a href="{% url 'administradores:listar_productos' %}?stock=sin_stock" class="btn btn-sm btn-outline-warning">Ver todos</a>
+                </div>
+                {% if productos_alerta %}
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0" style="font-size:.82rem;">
+                        <tbody>
+                            {% for prod in productos_alerta %}
+                            <tr>
+                                <td style="width:44px;">
+                                    {% if prod.imagen %}
+                                        <img src="{{ prod.imagen.url }}" alt=""
+                                             style="width:38px;height:38px;object-fit:cover;border-radius:6px;">
+                                    {% else %}
+                                        <div style="width:38px;height:38px;border-radius:6px;background:var(--border-color);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem;">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ prod.nombre }}</strong>
+                                    <small class="d-block text-muted">{{ prod.marca }} · {{ prod.categoria.icono_emoji }} {{ prod.categoria.nombre }}</small>
+                                </td>
+                                <td class="text-center align-middle">
+                                    {% if prod.stock == 0 %}
+                                        <span class="badge stock-zero">Agotado</span>
+                                    {% else %}
+                                        <span class="badge stock-low">{{ prod.stock }} paq.</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    <a href="{% url 'administradores:editar_producto' prod.id %}" class="btn btn-sm btn-outline-primary" style="font-size:.72rem;padding:.15rem .5rem;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-2x mb-2" style="color:var(--accent-success);opacity:.6;"></i>
+                        <p class="text-muted mb-0" style="font-size:.85rem;">Todo el inventario está bien.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== VENTAS RECIENTES ===== -->
+    <div class="chart-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0 fw-semibold">
+                <i class="fas fa-clock me-1" style="color:var(--accent-primary);"></i>
+                Ventas Recientes
+            </h6>
+            <div class="d-flex gap-2">
+                <a href="{% url 'administradores:ventas_dia' %}" class="btn btn-sm btn-outline-secondary">Hoy</a>
+                <a href="{% url 'administradores:ventas_reporte' %}" class="btn btn-sm btn-outline-primary">Reporte completo</a>
+            </div>
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" style="font-size:.85rem;">
                 <thead>
                     <tr>
-                        <th>Producto</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Artículos</th>
+                        <th>Pago</th>
+                        <th>Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos_recientes %}
+                    {% for venta in ventas_recientes %}
                     <tr>
+                        <td><strong>#{{ venta.id }}</strong></td>
                         <td>
-                            <strong>{{ producto.nombre }}</strong>
-                            <small class="d-block text-muted">{{ producto.marca }} · {{ producto.gramaje }}</small>
+                            {{ venta.fecha|date:"d/m/y" }}
+                            <small class="d-block text-muted">{{ venta.fecha|date:"H:i" }}</small>
                         </td>
-                        <td>{{ producto.categoria.icono_emoji }} {{ producto.categoria.nombre }}</td>
-                        <td>${{ producto.precio }}</td>
                         <td>
-                            {% if producto.stock > 10 %}
-                                <span class="badge bg-success">{{ producto.stock }} paq.</span>
-                            {% elif producto.stock > 0 %}
-                                <span class="badge bg-warning">{{ producto.stock }} paq.</span>
+                            {% if venta.usuario %}
+                                {{ venta.usuario.nombre_completo }}
+                                <small class="d-block text-muted">@{{ venta.usuario.nombre_usuario }}</small>
                             {% else %}
-                                <span class="badge bg-danger">Agotado</span>
+                                <span class="text-muted">—</span>
                             {% endif %}
                         </td>
+                        <td><span class="badge bg-primary">{{ venta.items.count }}</span></td>
                         <td>
-                            <a href="{% url 'administradores:editar_producto' producto.id %}" class="btn btn-sm btn-outline-primary me-1">
-                                <i class="fas fa-edit"></i>
+                            {% if venta.metodo_pago == 'tarjeta' %}
+                                <i class="fas fa-credit-card" style="color:var(--accent-primary);"></i>
+                            {% else %}
+                                <i class="fas fa-money-bill" style="color:var(--accent-success);"></i>
+                            {% endif %}
+                            {{ venta.get_metodo_pago_display }}
+                        </td>
+                        <td><strong style="color:var(--accent-success);">${{ venta.total|floatformat:2 }}</strong></td>
+                        <td>
+                            <a href="{% url 'administradores:detalle_venta' venta.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
                             </a>
-                            <form method="post" action="{% url 'administradores:eliminar_producto' producto.id %}" class="d-inline"
-                                  onsubmit="return confirm('¿Eliminar el producto &quot;{{ producto.nombre }}&quot;?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">No hay productos aún.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-receipt fa-2x d-block mb-2" style="opacity:.3;"></i>
+                            No hay ventas registradas.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const labels7  = {{ labels_7_dias|safe }};
+const datos7   = {{ datos_7_dias|safe }};
+const labels30 = {{ labels_30_dias|safe }};
+const datos30  = {{ datos_30_dias|safe }};
+
+const accentPrimary = getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim() || '#4f8ef7';
+const accentSuccess = getComputedStyle(document.documentElement).getPropertyValue('--accent-success').trim() || '#29cc6a';
+
+let chartVentas = null;
+
+function buildVentasChart(labels, datos) {
+    const ctx = document.getElementById('chartVentas').getContext('2d');
+    if (chartVentas) chartVentas.destroy();
+    chartVentas = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Ingresos ($)',
+                data: datos,
+                borderColor: accentPrimary,
+                backgroundColor: accentPrimary + '22',
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.35,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { font: { size: 11 } } },
+                y: {
+                    grid: { color: 'rgba(255,255,255,.06)' },
+                    ticks: { font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
+                }
+            }
+        }
+    });
+}
+
+function cambiarPeriodo(dias) {
+    document.querySelectorAll('#btnPeriodo .btn').forEach(b => {
+        b.classList.remove('active', 'btn-primary');
+        b.classList.add('btn-outline-primary');
+    });
+    event.target.classList.add('active', 'btn-primary');
+    event.target.classList.remove('btn-outline-primary');
+    if (dias === '7') buildVentasChart(labels7, datos7);
+    else buildVentasChart(labels30, datos30);
+}
+
+buildVentasChart(labels7, datos7);
+
+// Donut: métodos de pago
+new Chart(document.getElementById('chartPagos').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Efectivo', 'Tarjeta'],
+        datasets: [{
+            data: [{{ pago_efectivo }}, {{ pago_tarjeta }}],
+            backgroundColor: [accentSuccess + 'cc', accentPrimary + 'cc'],
+            borderColor: [accentSuccess, accentPrimary],
+            borderWidth: 2,
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '68%',
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } }
+        }
+    }
+});
+</script>
 {% endblock %}

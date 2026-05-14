@@ -84,7 +84,10 @@
     function renderCard(p, autenticado, esAdmin) {
         const img = p.imagen_url
             ? `<img src="${esc(p.imagen_url)}" alt="${esc(p.nombre)}" class="producto-card-img">`
-            : `<div class="producto-card-img-placeholder"><i class="fas fa-box"></i></div>`;
+            : `<div class="producto-card-img-placeholder">
+                <span class="ph-emoji">${esc(p.categoria_emoji || '📦')}</span>
+                <span class="ph-label">${esc(p.nombre.length > 18 ? p.nombre.slice(0,18)+'…' : p.nombre)}</span>
+               </div>`;
 
         let overlay = '';
         if (p.stock === 0) overlay = `<span class="stock-overlay">Agotado</span>`;

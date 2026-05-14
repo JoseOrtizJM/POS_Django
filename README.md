@@ -1,95 +1,101 @@
-# 🛍️ POS Django - Sistema de Punto de Venta Mayoreo
+# POS Django — Sistema de Punto de Venta Mayoreo
 
-> **Sistema completo de Punto de Venta (POS)** para gestión de mayoreo de abarrotes con autenticación, roles de usuario, panel de administración y CRUD de productos.
+Sistema completo de Punto de Venta para gestión de mayoreo de abarrotes, con catálogo, carrito, checkout, panel de administración con reportes y API REST.
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square)
-![Django](https://img.shields.io/badge/Django-6.0+-darkgreen?style=flat-square)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3+-purple?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-
----
-
-## 📋 Tabla de Contenidos
-
-- [Características](#características)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Estructura](#estructura)
-- [Autenticación](#autenticación)
-- [Panel de Administración](#panel-de-administración)
-- [Diseño y Estilos](#diseño-y-estilos)
-- [Comandos Útiles](#comandos-útiles)
+![Python](https://img.shields.io/badge/Python-3.14-blue?style=flat-square)
+![Django](https://img.shields.io/badge/Django-6.0.4-darkgreen?style=flat-square)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue?style=flat-square)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?style=flat-square)
 
 ---
 
-## ✨ Características
+## Características
 
-### 🔐 Sistema de Autenticación Completo
-- **Login**: Ingreso con email y contraseña
-- **Registro**: Creación de nuevas cuentas con validaciones
-- **Validación de Email**: Verificación de formato automática
-- **Roles**: Admin y Usuario Regular
+### Autenticación
+- Login y registro con email/contraseña
+- **Login con Google** (OAuth 2.0)
+- Roles separados: Administrador y Usuario
+- Sesiones independientes por rol
 
-### 👥 Gestión de Usuarios
-- Dos tipos de roles:
-  - **Administrador**: Acceso total a gestión
-  - **Usuario Regular**: Acceso solo a catálogo
-- Vista de usuarios registrados (solo admin)
-- Estadísticas de usuarios
+### Catálogo de Productos
+- 12 categorías con emoji identificador
+- 105+ productos con imagen, precio, stock y presentación
+- Buscador en tiempo real (AJAX) desde el dashboard
+- Buscador dentro de cada categoría
+- Placeholder visual con emoji de categoría cuando no hay imagen
+- Indicadores de stock (agotado / poco stock)
 
-### 🛒 Catálogo de Productos
-- **8 Categorías** precargadas con emoji
-- **26 Productos** de ejemplo listos para usar
-- Interfaz responsive con diseño oscuro profesional
-- Búsqueda y filtrado de productos
-- Visualización de:
-  - Nombre y marca
-  - Gramaje/presentación
-  - Precio en $MXN
-  - Stock disponible
-  - Descripción del producto
+### Carrito y Checkout
+- Widget de cantidad con actualización AJAX
+- Carrito persistente por usuario
+- Checkout con selección de tarjeta de crédito guardada
+- Notificación por correo al confirmar pedido (Gmail SMTP)
 
-### ⚙️ Panel de Administración
-- **Dashboard Admin** con estadísticas
-- **CRUD Completo de Productos**:
-  - ✅ Crear nuevos productos
-  - ✅ Editar productos existentes
-  - ✅ Eliminar productos
-  - ✅ Ver lista de productos
-- **Gestión de Usuarios**:
-  - Ver lista de usuarios
-  - Ver rol de cada usuario
-  - Ver fecha de registro
-  - Búsqueda en tiempo real
+### Panel de Administración
+- Dashboard con 6 KPIs en tiempo real (ventas del día, semana, mes, productos, clientes, stock bajo)
+- Gráfica de ventas con toggle 7 / 30 días (Chart.js)
+- Gráfica de métodos de pago (efectivo vs tarjeta)
+- Top 5 productos más vendidos del mes
+- Tabla de últimas 10 ventas
+- Alertas de productos con stock bajo (con imagen)
+- Accesos directos a todas las secciones
 
-### 🎨 Diseño y Estilos
-- **CSS Separado** en archivos estáticos
-- **JavaScript Separado** en archivos estáticos
-- Tema oscuro personalizado
-- Animaciones suaves
-- Interfaz 100% responsive
-- Compatibilidad móvil garantizada
+### CRUD Completo
+- **Productos**: crear, editar (con imagen), eliminar, activar/desactivar
+- **Categorías**: crear, editar, eliminar
+- **Usuarios**: listar, activar/desactivar, búsqueda y filtros
+
+### Reportes de Ventas
+- Vista de ventas del día con detalle por venta
+- Reporte por período: hoy, semana, mes o rango de fechas personalizado
+- Gráfica de ingresos diarios por período
+- Top 10 productos por ingresos en el período
+- Filtro de ventas por cliente en tiempo real
+
+### Perfil de Usuario
+- Edición de datos personales
+- Gestión de tarjetas de crédito
+- Historial de pedidos (vía API)
+
+### Perfil de Administrador
+- Edición de nombre de usuario y correo
+- Cambio de contraseña con validación en tiempo real
+
+### API REST
+Disponible en `/api/` con autenticación por token JWT:
+- Catálogo público (categorías y productos)
+- Auth: registro, login, logout (usuarios y admin)
+- Carrito y checkout
+- Historial de ventas del cliente
+- Panel admin: resumen, ventas, usuarios, productos
 
 ---
 
-## 🚀 Instalación
+## Requisitos Previos
 
-### Requisitos Previos
-- Python 3.8+
-- pip (gestor de paquetes de Python)
-- Git (opcional)
+- Python 3.10+
+- PostgreSQL 14+ corriendo en el puerto `5433`
+- pip
 
-### Pasos
+---
 
-1. **Clonar o descargar el proyecto**
+## Instalación
+
+1. **Clonar el proyecto**
    ```bash
-   cd "c:\Users\joseo\OneDrive\Documentos\S8\Web\Django-Final"
+   git clone <url-del-repositorio>
+   cd Django-Final
    ```
 
-2. **Crear ambiente virtual (si es necesario)**
+2. **Crear y activar entorno virtual**
    ```bash
    python -m venv venv
+
+   # Windows PowerShell
    .\venv\Scripts\Activate.ps1
+
+   # Linux / macOS
+   source venv/bin/activate
    ```
 
 3. **Instalar dependencias**
@@ -97,416 +103,123 @@
    pip install -r requirements.txt
    ```
 
-4. **Aplicar migraciones**
+4. **Configurar la base de datos**
+
+   Crea una base de datos PostgreSQL y un usuario con acceso. Luego edita `POS_Django/settings.py`:
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'pos_db',
+           'USER': 'pos_user',
+           'PASSWORD': 'tu_password',
+           'HOST': 'localhost',
+           'PORT': '5433',
+       }
+   }
+   ```
+
+5. **Aplicar migraciones**
    ```bash
    python manage.py migrate
    ```
 
-5. **Cargar datos iniciales**
+6. **Cargar datos iniciales**
    ```bash
    python manage.py cargar_datos
    ```
 
-6. **Crear usuario administrador (opcional)**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-7. **Iniciar servidor**
+7. **Iniciar el servidor**
    ```bash
    python manage.py runserver
    ```
 
-8. **Acceder a la aplicación**
-   - Dashboard: http://localhost:8000/
-   - Admin Panel: http://localhost:8000/admin/panel/
-   - Django Admin: http://localhost:8000/admin/
-
 ---
 
-## 🔑 Uso
+## Google OAuth (opcional)
 
-### Flujo de Uso
+Para habilitar el inicio de sesión con Google:
 
-#### Como Usuario Regular
-1. Ir a http://localhost:8000/
-2. Hacer clic en "Registrarse"
-3. Crear cuenta con email y contraseña
-4. Ver catálogo de productos
-5. Seleccionar categoría para ver productos
+1. Crea credenciales OAuth 2.0 en [Google Cloud Console](https://console.cloud.google.com)
+2. Agrega el URI de redirección: `http://127.0.0.1:8000/usuarios/google/callback/`
+3. Configura las variables de entorno antes de iniciar el servidor:
 
-#### Como Administrador
-1. Iniciar sesión con cuenta admin
-2. Ir a http://localhost:8000/admin/panel/
-3. Acciones disponibles:
-   - ➕ Crear nuevos productos
-   - ✏️ Editar productos
-   - 🗑️ Eliminar productos
-   - 👥 Ver usuarios registrados
+   ```powershell
+   # PowerShell
+   $env:GOOGLE_CLIENT_ID="TU_CLIENT_ID"
+   $env:GOOGLE_CLIENT_SECRET="TU_CLIENT_SECRET"
+   python manage.py runserver
+   ```
 
----
+   ```bash
+   # Linux / macOS
+   export GOOGLE_CLIENT_ID="TU_CLIENT_ID"
+   export GOOGLE_CLIENT_SECRET="TU_CLIENT_SECRET"
+   python manage.py runserver
+   ```
 
-## 📁 Estructura del Proyecto
-
-```
-Django-Final/
-├── catalogo/
-│   ├── migrations/
-│   │   ├── __init__.py
-│   │   ├── 0001_initial.py
-│   │   └── 0002_usuariopos.py          ← Nuevo modelo
-│   ├── management/
-│   │   └── commands/
-│   │       └── cargar_datos.py         ← Script de datos
-│   ├── static/                          ← ✅ Archivos estáticos
-│   │   └── catalogo/
-│   │       ├── css/
-│   │       │   └── style.css           ← ✅ CSS separado
-│   │       └── js/
-│   │           └── main.js             ← ✅ JS separado
-│   ├── templates/                       ← Templates HTML
-│   │   └── catalogo/
-│   │       ├── base.html               ← Template base
-│   │       ├── login.html              ← ✅ Login
-│   │       ├── registro.html           ← ✅ Registro
-│   │       ├── dashboard.html          ← Dashboard
-│   │       ├── productos_categoria.html
-│   │       ├── admin_panel.html        ← ✅ Panel admin
-│   │       ├── crear_producto.html     ← ✅ Crear
-│   │       ├── editar_producto.html    ← ✅ Editar
-│   │       └── listar_usuarios.html    ← ✅ Ver usuarios
-│   ├── models.py                        ← ✅ Nuevo modelo UsuarioPOS
-│   ├── views.py                         ← ✅ Nuevas vistas
-│   ├── urls.py                          ← ✅ Nuevas rutas
-│   ├── forms.py                         ← ✅ Nuevos formularios
-│   ├── admin.py
-│   └── apps.py
-├── POS_Django/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── manage.py
-├── db.sqlite3                           ← Base de datos
-├── INSTRUCCIONES.txt                    ← Instrucciones completas
-└── README.md                            ← Este archivo
-```
-
----
-
-## 🔐 Autenticación
-
-### Página de Login
-- **URL**: http://localhost:8000/login/
-- **Campos**: Email, Contraseña
-- **Validaciones**: 
-  - Email válido
-  - Contraseña requerida
-  - Usuario existe en BD
-
-### Página de Registro
-- **URL**: http://localhost:8000/registro/
-- **Campos**: 
-  - Correo electrónico
-  - Contraseña (mínimo 8 caracteres)
-  - Confirmación de contraseña
-- **Validaciones**:
-  - Email válido y único
-  - Formato de email correcto
-  - Contraseñas coinciden
-  - Contraseña mínimo 8 caracteres
-
-### Cierre de Sesión
-- Botón en navbar: "Cerrar Sesión"
-- Elimina sesión del usuario
-
----
-
-## 🎛️ Panel de Administración
-
-### Acceso
-- **URL**: http://localhost:8000/admin/panel/
-- **Restricción**: Solo administradores
-- **Redirección**: Si no eres admin, te redirecciona
-
-### Dashboard
-Muestra estadísticas en tiempo real:
-- Total de productos
-- Total de usuarios
-- Total de categorías
-- Últimos 5 productos
-
-### Gestión de Productos
-
-#### ➕ Crear Producto
-- **URL**: http://localhost:8000/admin/crear-producto/
-- **Campos**:
-  - Nombre ⭐
-  - Marca ⭐
-  - Gramaje ⭐
-  - Categoría ⭐
-  - Tipo de Paquete ⭐
-  - Piezas por Paquete ⭐
-  - Precio ($) ⭐
-  - Stock ⭐
-  - Imagen (opcional)
-  - Descripción (opcional)
-- ⭐ = Campos requeridos
-
-#### ✏️ Editar Producto
-- Acceso desde tabla del dashboard admin
-- Permite modificar todos los campos
-- Validaciones automáticas
-
-#### 🗑️ Eliminar Producto
-- Confirmación de seguridad
-- Eliminación irreversible
-- Actualización instantánea
-
-### Gestión de Usuarios
-- **URL**: http://localhost:8000/admin/usuarios/
-- **Información mostrada**:
-  - Email
-  - Usuario
-  - Rol (Admin/Usuario)
-  - Estado (Activo/Inactivo)
-  - Fecha de registro
-- **Búsqueda en tiempo real** ⚡
-
----
-
-## 🎨 Diseño y Estilos
-
-### Tema
-- **Color Primario**: Azul oscuro (#130961)
-- **Color Secundario**: Verde (#10b981)
-- **Fondo**: Gris oscuro (#3b3b3b)
-- **Texto Principal**: Gris claro (#e0e0e0)
-
-### Archivos Estáticos
-Todos los estilos y scripts están **separados en archivos externos**:
-
-```
-catalogo/static/catalogo/
-├── css/
-│   └── style.css      (Todos los estilos)
-└── js/
-    └── main.js        (Todas las funciones)
-```
-
-### Características CSS
-- Variables CSS para temas
-- Animaciones suaves
-- Responsive design
-- Compatibilidad con Bootstrap 5
-
-### Funciones JavaScript
-- Validaciones
-- Búsqueda en tablas
-- Notificaciones toast
-- Utilidades generales
-
----
-
-## 🔄 Comandos Útiles
-
-### Cargar/Recargar Datos
+Para producción con dominio propio, agrega también:
 ```bash
-# Primera vez o para agregar datos
-python manage.py cargar_datos
-
-# Limpiar y recargar todo
-python manage.py cargar_datos --clear
-```
-
-### Migraciones
-```bash
-# Ver cambios sin aplicar
-python manage.py makemigrations
-
-# Aplicar migraciones
-python manage.py migrate
-
-# Ver historial
-python manage.py migrate --list
-```
-
-### Usuario Admin
-```bash
-# Crear superusuario
-python manage.py createsuperuser
-
-# Cambiar contraseña
-python manage.py changepassword <username>
-```
-
-### Utilidades
-```bash
-# Activar shell de Django
-python manage.py shell
-
-# Recolectar archivos estáticos (producción)
-python manage.py collectstatic
-
-# Crear aplicación nueva
-python manage.py startapp <app_name>
+export GOOGLE_REDIRECT_URI="https://tudominio.com/usuarios/google/callback/"
 ```
 
 ---
 
-## 📊 Datos Cargados
+## Correo Electrónico (opcional)
 
-### Categorías (8)
-1. 🫒 Aceites y Grasas
-2. 🥤 Bebidas
-3. 🌾 Alimentos Secos
-4. 🧀 Productos Lácteos
-5. 🥩 Carnes y Embutidos
-6. 🍯 Salsas y Condimentos
-7. 🥫 Conservas
-8. 🥨 Snacks
+Configura en `settings.py` con una contraseña de aplicación de Gmail:
 
-### Productos (26)
-Incluye productos de ejemplo como:
-- Aceite de Oliva Extra Virgen
-- Refrescos y Bebidas
-- Arroz, Frijoles, Pasta
-- Leche y Productos Lácteos
-- Jamón, Salchicha, Tocino
-- Salsa de Tomate, Mayonesa
-- Atún en Lata, Chícharos
-- Papas Fritas, Cacahuates
-
----
-
-## 🌐 URLs Disponibles
-
-### Públicas (sin login requerido)
-- `/login/` - Página de inicio de sesión
-- `/registro/` - Página de registro
-
-### De Usuario
-- `/` - Dashboard/Inicio
-- `/categoria/<id>/` - Productos por categoría
-- `/logout/` - Cerrar sesión
-
-### De Administrador
-- `/admin/panel/` - Panel de administración
-- `/admin/crear-producto/` - Crear producto
-- `/admin/editar-producto/<id>/` - Editar producto
-- `/admin/eliminar-producto/<id>/` - Eliminar producto
-- `/admin/usuarios/` - Ver usuarios
-
-### Django Admin
-- `/admin/` - Panel de administración de Django
-
----
-
-## ⚡ Rendimiento
-
-- Base de datos SQLite (desarrollo)
-- Carga inicial de datos: < 2 segundos
-- Búsqueda en tablas: Instantánea
-- Interfaz responsive: Optimizada
-
----
-
-## 🐛 Solución de Problemas
-
-### Puerto 8000 ocupado
-```bash
-python manage.py runserver 8001
-```
-
-### Base de datos corrupta
-```bash
-# Eliminar db.sqlite3 y recrear
-python manage.py migrate
-python manage.py cargar_datos
-```
-
-### Archivos estáticos no se cargan
-```bash
-python manage.py collectstatic
-```
-
-### Error de migraciones
-```bash
-python manage.py migrate catalogo zero
-python manage.py migrate
+```python
+EMAIL_HOST_USER     = 'tu@gmail.com'
+EMAIL_HOST_PASSWORD = 'xxxx xxxx xxxx xxxx'  # Contraseña de aplicación
 ```
 
 ---
 
-## 📝 Licencia
+## URLs Principales
 
-Este proyecto está bajo licencia MIT.
+### Públicas
+| URL | Descripción |
+|-----|-------------|
+| `/` | Catálogo / Dashboard |
+| `/categoria/<id>/` | Productos de una categoría |
+| `/buscar/` | Búsqueda AJAX de productos |
+| `/usuarios/login/` | Inicio de sesión |
+| `/usuarios/registro/` | Registro de usuario |
+| `/usuarios/google/login/` | Login con Google |
 
----
+### Usuario autenticado
+| URL | Descripción |
+|-----|-------------|
+| `/usuarios/perfil/` | Perfil del usuario |
+| `/usuarios/carrito/` | Carrito de compras |
+| `/usuarios/checkout/` | Proceso de compra |
+| `/usuarios/tarjetas/` | Mis tarjetas |
+| `/usuarios/completar-perfil/` | Completar perfil (Google) |
 
-## 🙏 Créditos
+### Administrador
+| URL | Descripción |
+|-----|-------------|
+| `/administradores/login/` | Login de admin |
+| `/administradores/panel/` | Dashboard con KPIs y gráficas |
+| `/administradores/productos/` | Gestión de productos |
+| `/administradores/categorias/` | Gestión de categorías |
+| `/administradores/usuarios/` | Gestión de clientes |
+| `/administradores/ventas/` | Ventas del día |
+| `/administradores/ventas/reporte/` | Reporte por período |
+| `/administradores/perfil/` | Perfil del administrador |
 
-Desarrollado con:
-- Django 6.0.4
-- Bootstrap 5.3
-- Font Awesome 6.4
-- Python 3.8+
-
----
-
-## 📞 Soporte
-
-Para preguntas o problemas, consulta el archivo **INSTRUCCIONES.txt** para una guía completa.
-
----
-
-**Última actualización**: 28 de Abril, 2026  
-**Versión**: 2.0 (Con autenticación y panel admin)
-
-Se importaron **12 categorías** con sus emojis representativos:
-
-1. 🥤 Refrescos y Bebidas Carbonatadas (14 productos)
-2. 💧 Aguas y Bebidas Sin Gas (10 productos)
-3. 🧃 Jugos y Néctares (7 productos)
-4. ☕ Bebidas Calientes y Lácteas (7 productos)
-5. 🍚 Granos y Cereales (11 productos)
-6. 🍝 Pastas y Sopas (9 productos)
-7. 🥫 Enlatados y Conservas (7 productos)
-8. 🧂 Aceites, Salsas y Condimentos (9 productos)
-9. 🍬 Dulces y Botanas (8 productos)
-10. 🧻 Limpieza del Hogar (10 productos)
-11. 🧼 Higiene Personal (7 productos)
-12. 🍞 Panadería y Snacks Empacados (6 productos)
-
-**Total: 105 productos cargados**
-
-### 4. **Modelos de Datos** 🗄️
-
-#### Categoria
-- `nombre`: Nombre único de la categoría
-- `descripcion`: Descripción opcional
-- `icono_emoji`: Emoji representativo (ej: 🥤)
-- `imagen`: Opcional para imagen de categoría
-- Timestamps: `creado_en`, `actualizado_en`
-
-#### Producto
-- `nombre`: Nombre del producto
-- `marca`: Marca del producto
-- `gramaje`: Presentación (600ml, 1kg, 250g, etc.)
-- `categoria`: ForeignKey a Categoría
-- `tipo_paquete`: Paquete, Caja, Bulto, Costal
-- `piezas_por_paquete`: Cantidad de unidades por paquete
-- `precio`: Precio en pesos mexicanos (DecimalField)
-- `stock`: Inventario en paquetes
-- `descripcion`: Descripción adicional
-- `imagen`: Campo para imagen del producto
-- `activo`: Estado del producto
-- Timestamps: `creado_en`, `actualizado_en`
-
-### 5. **Panel de Administración** 🔐
-- Acceso completo a gestión de categorías y productos
-- Interfaz personalizada con campos organizados
-- Filtros y búsqueda integrados
-- Readonly de campos de fecha
+### API REST
+| URL | Descripción |
+|-----|-------------|
+| `/api/categorias/` | Lista de categorías |
+| `/api/productos/` | Lista de productos |
+| `/api/auth/registro/` | Registro vía API |
+| `/api/auth/login/` | Login vía API (devuelve token) |
+| `/api/carrito/` | Carrito del usuario |
+| `/api/checkout/` | Confirmar pedido |
+| `/api/ventas/` | Historial de ventas |
+| `/api/admin/resumen/` | Resumen para admin |
 
 ---
 
@@ -514,93 +227,104 @@ Se importaron **12 categorías** con sus emojis representativos:
 
 ```
 Django-Final/
-├── manage.py
-├── db.sqlite3
-├── POS_Django/
-│   ├── settings.py (actualizado)
-│   ├── urls.py (actualizado)
-│   ├── asgi.py
-│   ├── wsgi.py
-│   └── __init__.py
-├── catalogo/
-│   ├── models.py (Categoria, Producto)
-│   ├── admin.py (registro en admin)
-│   ├── views.py (dashboard, productos_por_categoria)
-│   ├── urls.py (rutas)
-│   ├── management/
-│   │   └── commands/
-│   │       └── cargar_datos.py (comando para cargar datos)
-│   └── templates/
-│       └── catalogo/
-│           ├── base.html (template base)
-│           ├── dashboard.html (listado de categorías)
-│           └── productos_categoria.html (listado de productos)
-├── media/ (archivos multimedia)
-├── staticfiles/ (archivos estáticos)
-└── venv/ (entorno virtual)
+├── POS_Django/               # Configuración principal
+│   ├── settings.py
+│   ├── urls.py
+│   └── context_processors.py
+├── catalogo/                 # App principal: dashboard y catálogo
+│   ├── models.py             # Categoria, Producto
+│   ├── views.py              # dashboard, productos_por_categoria, buscar
+│   ├── management/commands/cargar_datos.py
+│   ├── static/catalogo/
+│   │   ├── vendor/           # Bootstrap y FontAwesome locales
+│   │   ├── css/
+│   │   │   ├── base/         # variables, globals, navbar
+│   │   │   ├── components/   # cards, buttons, forms, tables, alerts
+│   │   │   └── pages/        # dashboard, catalogo
+│   │   └── js/               # utils, carrito, main
+│   └── templates/catalogo/
+│       ├── base.html
+│       ├── dashboard.html
+│       └── productos_categoria.html
+├── usuarios/                 # App de clientes
+│   ├── models.py             # Usuario, TarjetaCredito, Carrito, CarritoItem
+│   ├── views.py              # auth, carrito, checkout, perfil, Google OAuth
+│   ├── forms.py
+│   └── templates/usuarios/
+│       ├── login.html
+│       ├── registro.html
+│       ├── perfil.html
+│       ├── carrito.html
+│       ├── checkout.html
+│       ├── mis_tarjetas.html
+│       └── completar_perfil.html
+├── administradores/          # App de administración
+│   ├── models.py             # Administrador
+│   ├── views.py              # panel, CRUD, reportes, perfil
+│   └── templates/administradores/
+│       ├── panel.html        # Dashboard con KPIs y Chart.js
+│       ├── listar_productos.html
+│       ├── crear_producto.html
+│       ├── editar_producto.html
+│       ├── listar_categorias.html
+│       ├── listar_usuarios.html
+│       ├── ventas_dia.html
+│       ├── ventas_reporte.html
+│       ├── detalle_venta.html
+│       └── perfil.html
+├── api/                      # REST API (Django REST Framework)
+│   ├── views.py
+│   ├── serializers.py
+│   ├── authentication.py
+│   └── urls.py
+├── ventas/                   # Modelo de ventas
+│   └── models.py             # Venta, ItemVenta
+├── media/                    # Imágenes subidas (productos, categorías)
+├── requirements.txt
+└── manage.py
 ```
 
 ---
 
-## Cómo Usar
+## Comandos Útiles
 
-### 1. **Iniciar el servidor**
 ```bash
-cd "c:\Users\joseo\OneDrive\Documentos\S8\Web\Django-Final"
-python manage.py runserver
-```
+# Cargar datos iniciales
+python manage.py cargar_datos
 
-### 2. **Acceder a la aplicación**
-- **Dashboard**: http://localhost:8000/
-- **Admin Panel**: http://localhost:8000/admin/
-  - Usuario: `admin`
-  - Contraseña: `admin123`
+# Recargar datos (limpia primero)
+python manage.py cargar_datos --clear
 
-### 3. **Cargar más datos**
-```bash
-python manage.py cargar_datos --clear  # Limpia datos existentes e importa nuevos
-```
+# Crear migraciones
+python manage.py makemigrations
 
-### 4. **Crear migraciones (si modificas los modelos)**
-```bash
-python manage.py makemigrations catalogo
+# Aplicar migraciones
 python manage.py migrate
+
+# Recolectar estáticos (producción)
+python manage.py collectstatic
+
+# Shell de Django
+python manage.py shell
+
+# Servidor en otro puerto
+python manage.py runserver 8001
 ```
 
 ---
 
-## Personalización y Próximos Pasos
+## Tecnologías
 
-### Sugerencias para expansión:
-1. **Carrito de compras**: Agregar funcionalidad de compra
-2. **Descuentos**: Sistema de promociones por volumen
-3. **Reportes**: Generación de reportes de ventas
-4. **Usuarios**: Sistema de login para clientes
-5. **Búsqueda y filtros**: Buscador de productos avanzado
-6. **Imágenes de categorías**: Subir imágenes en lugar de emojis
-7. **PDF**: Generación de boletas de compra
-8. **API REST**: Crear endpoints para aplicaciones móviles
-
----
-
-## Tecnologías Utilizadas
-
-- **Backend**: Django 4.2.27
-- **Frontend**: Bootstrap 5.3.0
-- **Base de Datos**: SQLite3
-- **CSS/JS**: Customizado + Font Awesome 6.4.0
-
----
-
-## Notas Importantes
-
-✅ Todos los precios están en **Pesos Mexicanos ($)**
-✅ Los emojis se muestran automáticamente en cada categoría
-✅ El sistema es completamente responsive
-✅ Los estilos CSS incluyen animaciones suaves y hover effects
-✅ La tabla de productos es ordenable y sorteable
-✅ Stock con indicadores visuales de disponibilidad
-
----
-
-**Proyecto completado exitosamente el 22 de abril de 2026** 🎉
+| Tecnología | Versión | Uso |
+|-----------|---------|-----|
+| Python | 3.14 | Lenguaje principal |
+| Django | 6.0.4 | Framework web |
+| PostgreSQL | 16+ | Base de datos |
+| Django REST Framework | 3.17.1 | API REST |
+| psycopg2-binary | 2.9.12 | Adaptador PostgreSQL |
+| Pillow | 12.2.0 | Imágenes de productos |
+| PyJWT | 2.12.1 | Tokens JWT para API |
+| requests | 2.33.1 | Google OAuth / HTTP |
+| Bootstrap | 5.3 | UI (servido localmente) |
+| Font Awesome | 6 | Íconos (servido localmente) |
+| Chart.js | 4.4.3 | Gráficas en panel admin |

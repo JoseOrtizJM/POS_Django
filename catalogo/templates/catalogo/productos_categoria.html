@@ -54,7 +54,8 @@
                 <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-card-img">
             {% else %}
                 <div class="producto-card-img-placeholder">
-                    <i class="fas fa-box"></i>
+                    <span class="ph-emoji">{{ producto.categoria.icono_emoji }}</span>
+                    <span class="ph-label">{{ producto.nombre|truncatechars:18 }}</span>
                 </div>
             {% endif %}
 

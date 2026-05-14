@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Q
 from categorias.models import Categoria
@@ -6,6 +6,8 @@ from .models import Producto
 
 
 def dashboard(request):
+    if request.session.get('admin_id'):
+        return redirect('administradores:panel')
     categorias = Categoria.objects.all()
     return render(request, 'catalogo/dashboard.html', {
         'categorias': categorias,
@@ -53,6 +55,7 @@ def buscar_productos(request):
             'imagen_url': p.imagen.url if p.imagen else None,
             'categoria_id': p.categoria_id,
             'categoria_nombre': p.categoria.nombre,
+            'categoria_emoji': p.categoria.icono_emoji,
             'cantidad_en_carrito': cantidades_carrito.get(p.id, 0),
             'url_set_cantidad': reverse('usuarios:set_cantidad', args=[p.id]),
         })

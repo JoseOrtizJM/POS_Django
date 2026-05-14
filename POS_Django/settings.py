@@ -146,6 +146,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ── Google OAuth 2.0 ─────────────────────────────────────────────
+import os
+GOOGLE_CLIENT_ID     = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+GOOGLE_REDIRECT_URI  = os.environ.get(
+    'GOOGLE_REDIRECT_URI',
+    'http://127.0.0.1:8000/usuarios/google/callback/'
+)
+
 # ── Email (Gmail SMTP) ────────────────────────────────────────────
 # Genera una contraseña de aplicación en:
 # myaccount.google.com → Seguridad → Contraseñas de aplicaciones

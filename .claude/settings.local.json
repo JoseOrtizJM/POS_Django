@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python manage.py makemigrations usuarios --name=\"google_oauth_fields\")",
+      "Bash(venv/Scripts/python manage.py migrate)"
+    ]
+  }
+}

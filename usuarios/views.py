@@ -57,7 +57,9 @@ def login_view(request):
             else:
                 usuario = Usuario.objects.filter(nombre_usuario__iexact=identificador, activo=True).first()
 
-            if usuario and usuario.verificar_password(contrasena):
+            if usuario and not usuario.password and usuario.google_id:
+                messages.error(request, 'Esta cuenta fue creada con Google. Usa el botón "Continuar con Google" para iniciar sesión.')
+            elif usuario and usuario.verificar_password(contrasena):
                 request.session['usuario_id'] = usuario.id
                 request.session['tipo_sesion'] = 'usuario'
                 messages.success(request, f'¡Bienvenido, {usuario.get_nombre_corto()}!')
@@ -434,3 +436,136 @@ def set_cantidad_carrito(request, producto_id):
         'carrito_total': float(carrito.total()),
         'subtotal': float(producto.precio * cantidad),
     })
+
+
+
+# ==================== COMPLETAR PERFIL (Google) ====================
+
+def completar_perfil(request):
+    usuario = _get_usuario(request)
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, usuario=usuario)
+        if form.is_valid():
+            d = form.cleaned_data
+            usuario.nombre_completo  = d['nombre_completo']
+            usuario.email            = d['email']
+            usuario.telefono         = d['telefono']
+            usuario.direccion        = d['direccion']
+            usuario.ciudad           = d['ciudad']
+            usuario.estado_provincia = d['estado_provincia']
+            usuario.codigo_postal    = d['codigo_postal']
+            usuario.pais             = d['pais']
+            usuario.save()
+            messages.success(request, '¡Perfil completado! Bienvenido al sistema.')
+            return redirect('catalogo:dashboard')
+    else:
+        form = PerfilForm(initial={
+            'nombre_completo':  usuario.nombre_completo,
+            'email':            usuario.email,
+            'telefono':         usuario.telefono,
+            'direccion':        usuario.direccion,
+            'ciudad':           usuario.ciudad,
+            'estado_provincia': usuario.estado_provincia,
+            'codigo_postal':    usuario.codigo_postal,
+            'pais':             usuario.pais,
+        }, usuario=usuario)
+
+    return render(request, 'usuarios/completar_perfil.html', {'form': form, 'usuario': usuario})
+
+
+# ==================== GOOGLE OAUTH ====================
+
+def google_login(request):
+    import urllib.parse
+    from django.conf import settings
+
+    params = {
+        'client_id':     settings.GOOGLE_CLIENT_ID,
+        'redirect_uri':  settings.GOOGLE_REDIRECT_URI,
+        'response_type': 'code',
+        'scope':         'openid email profile',
+        'access_type':   'online',
+    }
+    url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urllib.parse.urlencode(params)
+    return redirect(url)
+
+
+def google_callback(request):
+    import requests as req
+    from django.conf import settings
+
+    code = request.GET.get('code')
+    if not code:
+        messages.error(request, 'Inicio de sesión con Google cancelado.')
+        return redirect('usuarios:login')
+
+    # Intercambiar código por access token
+    token_resp = req.post('https://oauth2.googleapis.com/token', data={
+        'code':          code,
+        'client_id':     settings.GOOGLE_CLIENT_ID,
+        'client_secret': settings.GOOGLE_CLIENT_SECRET,
+        'redirect_uri':  settings.GOOGLE_REDIRECT_URI,
+        'grant_type':    'authorization_code',
+    })
+    token_data = token_resp.json()
+    access_token = token_data.get('access_token')
+
+    if not access_token:
+        messages.error(request, 'No se pudo autenticar con Google. Intenta de nuevo.')
+        return redirect('usuarios:login')
+
+    # Obtener perfil del usuario de Google
+    info_resp = req.get(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        headers={'Authorization': f'Bearer {access_token}'}
+    )
+    info = info_resp.json()
+
+    google_id = info.get('sub')
+    email     = info.get('email')
+    nombre    = info.get('name', '')
+
+    if not email or not google_id:
+        messages.error(request, 'Google no proporcionó los datos necesarios.')
+        return redirect('usuarios:login')
+
+    # 1. Buscar por google_id (usuario ya registró con Google antes)
+    usuario = Usuario.objects.filter(google_id=google_id).first()
+
+    # 2. Si no, buscar por email (puede tener cuenta normal)
+    if not usuario:
+        usuario = Usuario.objects.filter(email=email).first()
+        if usuario:
+            usuario.google_id = google_id
+            usuario.save(update_fields=['google_id'])
+
+    # 3. Si no existe, crear cuenta nueva
+    if not usuario:
+        base_username = email.split('@')[0]
+        username = base_username
+        contador = 1
+        while Usuario.objects.filter(nombre_usuario=username).exists():
+            username = f'{base_username}{contador}'
+            contador += 1
+
+        usuario = Usuario.objects.create(
+            email=email,
+            nombre_usuario=username,
+            nombre_completo=nombre or email.split('@')[0],
+            password='',
+            google_id=google_id,
+            activo=True,
+        )
+        messages.success(request, f'Cuenta creada con Google. Completa tu perfil.')
+    else:
+        messages.success(request, f'Bienvenido de nuevo, {usuario.get_nombre_corto()}.')
+
+    request.session['usuario_id'] = usuario.id
+
+    perfil_incompleto = not all([usuario.telefono, usuario.direccion, usuario.ciudad,
+                                 usuario.estado_provincia, usuario.codigo_postal])
+    if perfil_incompleto:
+        return redirect('usuarios:completar_perfil')
+
+    return redirect('catalogo:dashboard')

@@ -5,6 +5,8 @@ from django.contrib.auth.hashers import make_password, check_password
 def validar_telefono(telefono):
     import re
     from django.core.exceptions import ValidationError
+    if not telefono:
+        return
     patron = r'^\+?1?\d{9,15}$'
     if not re.match(patron, telefono.replace(' ', '').replace('-', '')):
         raise ValidationError('Número de teléfono inválido (ej: 5512345678)')
@@ -24,15 +26,16 @@ class Usuario(models.Model):
 
     email = models.EmailField(unique=True)
     nombre_usuario = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=255)
+    password = models.CharField(max_length=255, blank=True)
+    google_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     nombre_completo = models.CharField(max_length=150)
-    telefono = models.CharField(max_length=20, validators=[validar_telefono])
+    telefono = models.CharField(max_length=20, blank=True, validators=[validar_telefono])
 
-    direccion = models.CharField(max_length=255)
-    ciudad = models.CharField(max_length=100)
-    estado_provincia = models.CharField(max_length=100)
-    codigo_postal = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255, blank=True)
+    ciudad = models.CharField(max_length=100, blank=True)
+    estado_provincia = models.CharField(max_length=100, blank=True)
+    codigo_postal = models.CharField(max_length=20, blank=True)
     pais = models.CharField(max_length=2, choices=PAISES, default='MX')
 
     activo = models.BooleanField(default=True)
