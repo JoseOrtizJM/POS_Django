@@ -14,6 +14,9 @@ PyJWT==2.12.1
 # Peticiones HTTP
 requests==2.33.1
 
+# Correo transaccional (Resend)
+django-anymail[resend]==15.0
+
 # Dependencias de Django (instaladas automáticamente)
 asgiref==3.11.1
 sqlparse==0.5.5

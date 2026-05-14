@@ -153,7 +153,6 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── Google OAuth 2.0 ─────────────────────────────────────────────
-import os
 GOOGLE_CLIENT_ID     = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_REDIRECT_URI  = os.environ.get(
@@ -161,14 +160,11 @@ GOOGLE_REDIRECT_URI  = os.environ.get(
     'http://127.0.0.1:8000/usuarios/google/callback/'
 )
 
-# ── Email (Gmail SMTP) ────────────────────────────────────────────
-# Genera una contraseña de aplicación en:
-# myaccount.google.com → Seguridad → Contraseñas de aplicaciones
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'juliortizmartinez623@gmail.com'
-EMAIL_HOST_PASSWORD = 'aeyh lwnc hkke iies'  # Contraseña de aplicación de Google
-DEFAULT_FROM_EMAIL = 'Mayorista <juliortizmartinez623@gmail.com>'
-EMAIL_NOTIFICACIONES_ENABLED = True  # Ponlo en True cuando configures el correo
+# ── Email (Resend vía django-anymail) ─────────────────────────────
+EMAIL_BACKEND   = 'anymail.backends.resend.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
+EMAIL_NOTIFICACIONES_ENABLED = os.environ.get('EMAIL_NOTIFICACIONES_ENABLED', 'False') == 'True'
+
+ANYMAIL = {
+    'RESEND_API_KEY': os.environ.get('RESEND_API_KEY', ''),
+}
