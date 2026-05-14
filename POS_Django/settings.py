@@ -66,6 +66,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -152,6 +153,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── Google OAuth 2.0 ─────────────────────────────────────────────
+import os
 GOOGLE_CLIENT_ID     = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_REDIRECT_URI  = os.environ.get(
@@ -166,7 +168,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@example.com')
-EMAIL_NOTIFICACIONES_ENABLED = os.environ.get('EMAIL_NOTIFICACIONES_ENABLED', 'True') == 'True'
+EMAIL_HOST_USER = 'juliortizmartinez623@gmail.com'
+EMAIL_HOST_PASSWORD = 'aeyh lwnc hkke iies'  # Contraseña de aplicación de Google
+DEFAULT_FROM_EMAIL = 'Mayorista <juliortizmartinez623@gmail.com>'
+EMAIL_NOTIFICACIONES_ENABLED = True  # Ponlo en True cuando configures el correo

@@ -25,3 +25,6 @@ python-dotenv==1.0.0
 
 # CORS (si lo necesitas para API)
 django-cors-headers==4.3.1
+
+# Servir archivos estáticos en producción
+whitenoise==6.6.0
