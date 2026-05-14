@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a+u)2*i6r6ia71a2k4yl+k+v0=cu11c1r2yetvm!g&qo2g74%t'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a+u)2*i6r6ia71a2k4yl+k+v0=cu11c1r2yetvm!g&qo2g74%t')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -96,11 +101,11 @@ WSGI_APPLICATION = 'POS_Django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pos_db',
-        'USER': 'pos_user',
-        'PASSWORD': 'Marzo.2004',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': os.environ.get('DB_NAME', 'pos_db'),
+        'USER': os.environ.get('DB_USER', 'pos_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'Marzo.2004'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5433'),
     }
 }
 
@@ -147,7 +152,6 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── Google OAuth 2.0 ─────────────────────────────────────────────
-import os
 GOOGLE_CLIENT_ID     = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_REDIRECT_URI  = os.environ.get(
@@ -162,7 +166,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'juliortizmartinez623@gmail.com'
-EMAIL_HOST_PASSWORD = 'aeyh lwnc hkke iies'  # Contraseña de aplicación de Google
-DEFAULT_FROM_EMAIL = 'Mayorista <juliortizmartinez623@gmail.com>'
-EMAIL_NOTIFICACIONES_ENABLED = True  # Ponlo en True cuando configures el correo
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@example.com')
+EMAIL_NOTIFICACIONES_ENABLED = os.environ.get('EMAIL_NOTIFICACIONES_ENABLED', 'True') == 'True'
