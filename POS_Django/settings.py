@@ -164,7 +164,7 @@ GOOGLE_REDIRECT_URI  = os.environ.get(
 # ── Email (Resend vía django-anymail) ─────────────────────────────
 EMAIL_BACKEND   = 'anymail.backends.resend.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
-EMAIL_NOTIFICACIONES_ENABLED = os.environ.get('EMAIL_NOTIFICACIONES_ENABLED', 'False') == 'True'
+EMAIL_NOTIFICACIONES_ENABLED = os.environ.get('EMAIL_NOTIFICACIONES_ENABLED', 'false').lower() == 'true'
 
 ANYMAIL = {
     'RESEND_API_KEY': os.environ.get('RESEND_API_KEY', ''),
